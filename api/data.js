@@ -5,19 +5,25 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   try {
-    const body = req.body;
     const apiKey = process.env.WINDSOR_API_KEY;
     if (!apiKey) throw new Error("WINDSOR_API_KEY environment variable is not set");
 
-    const upstream = await fetch(`https://connectors.windsor.ai/facebook?api_key=${apiKey}`, {
+    // Parse body — Vercel may or may not auto-parse JSON
+    let body = req.body;
+    if (typeof body === "string") body = JSON.parse(body);
+
+    // Add the API key into the request body (Windsor.ai accepts it this way)
+    const payload = { ...body, api_key: apiKey };
+
+    const upstream = await fetch("https://connectors.windsor.ai/facebook", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
 
     if (!upstream.ok) {
       const text = await upstream.text();
-      throw new Error(`Windsor.ai responded with ${upstream.status}: ${text}`);
+      throw new Error(`Windsor.ai error ${upstream.status}: ${text}`);
     }
 
     const data = await upstream.json();
