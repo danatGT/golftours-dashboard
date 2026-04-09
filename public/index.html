@@ -205,22 +205,21 @@ const CAMPAIGN_FILTER = ["campaign", "eq", "GT - Traffic - 2026"];
    Calls /api/data (Vercel serverless fn)
    which injects the API key server-side
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-async function fetchWindsor(fields, extra = {}) {
-  const body = {
-    connector: "facebook",
-    accounts: [ACCOUNT_ID],
-    date_preset: "this_monthT",
-    fields,
-    filters: [CAMPAIGN_FILTER],
-    ...extra
-  };
-  const res = await fetch("/api/data", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) throw new Error("API error: " + res.status);
+async function fetchWindsor(fields) {
+  // Windsor.ai uses GET with query params
+  const params = new URLSearchParams();
+  params.set("fields", fields.join(","));
+  params.set("date_preset", "this_monthT");
+  params.set("accounts", ACCOUNT_ID);
+  params.set("filters", JSON.stringify([CAMPAIGN_FILTER]));
+
+  const res = await fetch("/api/data?" + params.toString());
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "API error: " + res.status);
+  }
   const json = await res.json();
+  // Windsor returns { data: [...] } or just [...]
   return json.data || json;
 }
 
