@@ -1,5 +1,10 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/public/$1" }
-  ]
+  ],
+  "build": {
+    "env": {
+      "WINDSOR_API_KEY": "@windsor_api_key"
+    }
+  }
 }
