@@ -10,18 +10,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Windsor.ai uses GET with query params — not POST with JSON body
-    const { fields, date_preset, filters, accounts } = req.method === "POST" ? req.body : req.query;
+    const { fields, date_preset, filters, accounts } = req.query;
 
     const params = new URLSearchParams();
     params.set("api_key", apiKey);
-    params.set("fields", Array.isArray(fields) ? fields.join(",") : fields);
+    params.set("fields", fields);
     if (date_preset) params.set("date_preset", date_preset);
-    if (accounts) params.set("accounts", Array.isArray(accounts) ? accounts.join(",") : accounts);
-    if (filters) params.set("filter", typeof filters === "string" ? filters : JSON.stringify(filters));
+    if (accounts)    params.set("accounts", accounts);
+    if (filters)     params.set("filter", filters);
 
     const url = `https://connectors.windsor.ai/facebook?${params.toString()}`;
-
     const upstream = await fetch(url, { method: "GET" });
     const text = await upstream.text();
 
