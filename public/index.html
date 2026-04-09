@@ -246,12 +246,16 @@ function makeChart(id, cfg) {
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 async function render() {
   try {
-    /* ── Parallel fetches ── */
+    /* ── Parallel fetches with individual timeouts ── */
+    const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out after " + ms/1000 + "s")), ms));
+
+    const safeFetch = (fields, extra={}) => Promise.race([fetchWindsor(fields, extra), timeout(15000)]);
+
     const [campData, adsetData, ageData, dailyData] = await Promise.all([
-      fetchWindsor(["campaign","spend","impressions","clicks","ctr","cpc","cpm","reach","actions_link_click","frequency","outbound_clicks_outbound_click","cost_per_outbound_click_outbound_click"]),
-      fetchWindsor(["adset_name","spend","impressions","clicks","ctr","cpc","reach","actions_link_click","outbound_clicks_outbound_click"]),
-      fetchWindsor(["age","gender","spend","impressions","clicks","ctr","reach"]),
-      fetchWindsor(["date","spend","ctr","cpm","outbound_clicks_outbound_click"], {})
+      safeFetch(["campaign","spend","impressions","clicks","ctr","cpc","cpm","reach","actions_link_click","frequency","outbound_clicks_outbound_click","cost_per_outbound_click_outbound_click"]),
+      safeFetch(["adset_name","spend","impressions","clicks","ctr","cpc","reach","actions_link_click","outbound_clicks_outbound_click"]),
+      safeFetch(["age","gender","spend","impressions","clicks","ctr","reach"]),
+      safeFetch(["date","spend","ctr","cpm","outbound_clicks_outbound_click"])
     ]);
 
     /* ── Aggregate campaign totals ── */
@@ -431,7 +435,7 @@ async function render() {
     document.getElementById("loading").style.display = "none";
     const errEl = document.getElementById("error-msg");
     errEl.style.display = "block";
-    errEl.textContent = "Error: " + err.message + " — Check: 1) WINDSOR_API_KEY is set in Vercel Environment Variables, 2) you redeployed after adding the key, 3) the api/data.js file is correct on GitHub.";
+    errEl.innerHTML = "<strong>Could not load data.</strong> Reason: " + err.message + "<br><br>Things to check:<br>1. <code>WINDSOR_API_KEY</code> is set in Vercel → Settings → Environment Variables<br>2. You redeployed after adding the key<br>3. <code>api/data.js</code> is in the root of your GitHub repo (not inside public/)";
   }
 }
 
