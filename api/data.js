@@ -1,42 +1,35 @@
-export const config = {
-  api: {
-    bodyParser: true,
-  },
-};
-
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   if (req.method === "OPTIONS") return res.status(200).end();
 
   const apiKey = process.env.WINDSOR_API_KEY;
-
   if (!apiKey) {
     return res.status(500).json({ error: "WINDSOR_API_KEY is not set in Vercel environment variables" });
   }
 
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    // Windsor.ai uses GET with query params — not POST with JSON body
+    const { fields, date_preset, filters, accounts } = req.method === "POST" ? req.body : req.query;
 
-    const url = `https://connectors.windsor.ai/facebook?api_key=${encodeURIComponent(apiKey)}`;
+    const params = new URLSearchParams();
+    params.set("api_key", apiKey);
+    params.set("fields", Array.isArray(fields) ? fields.join(",") : fields);
+    if (date_preset) params.set("date_preset", date_preset);
+    if (accounts) params.set("accounts", Array.isArray(accounts) ? accounts.join(",") : accounts);
+    if (filters) params.set("filter", typeof filters === "string" ? filters : JSON.stringify(filters));
 
-    const upstream = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const url = `https://connectors.windsor.ai/facebook?${params.toString()}`;
 
-    const responseText = await upstream.text();
+    const upstream = await fetch(url, { method: "GET" });
+    const text = await upstream.text();
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      return res.status(500).json({ error: "Windsor.ai returned invalid JSON", raw: responseText.slice(0, 500) });
+    if (!upstream.ok) {
+      return res.status(upstream.status).json({ error: `Windsor.ai error ${upstream.status}`, detail: text.slice(0, 300) });
     }
 
+    const data = JSON.parse(text);
     return res.status(200).json(data);
 
   } catch (err) {
