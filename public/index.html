@@ -431,7 +431,7 @@ async function render() {
     document.getElementById("loading").style.display = "none";
     const errEl = document.getElementById("error-msg");
     errEl.style.display = "block";
-    errEl.textContent = "Could not load data: " + err.message + ". Check your Windsor.ai API key and ensure the Facebook connector is active.";
+    errEl.textContent = "Error: " + err.message + " — Check: 1) WINDSOR_API_KEY is set in Vercel Environment Variables, 2) you redeployed after adding the key, 3) the api/data.js file is correct on GitHub.";
   }
 }
 
