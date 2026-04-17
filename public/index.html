@@ -385,8 +385,8 @@
    ════════════════════════════════════════════════════ */
 const ACCOUNT_ID = "532007480578438";
 const CAMPAIGNS  = {
-  traffic:   ["campaign","eq","GT - Traffic - 2026"],
-  awareness: ["campaign","eq","GT - Brand Awareness - 2026"]
+  traffic:   [["campaign","eq","GT - Traffic - 2026"],   "and", ["account_id","eq","532007480578438"]],
+  awareness: [["campaign","eq","GT - Brand Awareness - 2026"], "and", ["account_id","eq","532007480578438"]]
 };
 
 let activeCampaign = "traffic";
@@ -459,6 +459,13 @@ function switchCampaign(name){
   document.getElementById("error-msg").style.display="none";
   document.getElementById("dashboard").style.display="none";
   document.getElementById("loading").style.display="flex";
+  // Clear stale table content so previous campaign data doesn't flash on switch
+  document.getElementById("adsetTableWrap").innerHTML="";
+  document.getElementById("adTableWrap").innerHTML="";
+  document.getElementById("kpiGrid").innerHTML="";
+  document.getElementById("ai-content").className="ai-loading";
+  document.getElementById("ai-content").innerHTML='<div class="ai-spinner"></div>Analysing campaign data…';
+  currentData={};
   render();
 }
 
@@ -467,11 +474,14 @@ function switchCampaign(name){
    All requests go through /api/data which injects the API key
    ════════════════════════════════════════════════════ */
 async function fetchWindsor(fields){
+  // Snapshot the active campaign at the moment of the call
+  // so tab-switching mid-load can't mix data between campaigns
+  const campaign = activeCampaign;
   const p=new URLSearchParams();
   p.set("fields",fields.join(","));
   p.set("date_preset","this_monthT");
   p.set("accounts",ACCOUNT_ID);
-  p.set("filters",JSON.stringify([CAMPAIGNS[activeCampaign]]));
+  p.set("filters",JSON.stringify(CAMPAIGNS[campaign]));
   const res=await fetch("/api/data?"+p.toString());
   if(!res.ok){
     const txt=await res.text();
