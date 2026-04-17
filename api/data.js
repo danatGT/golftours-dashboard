@@ -1,7 +1,9 @@
 // api/data.js
 // Proxies Windsor.ai requests server-side so WINDSOR_API_KEY never reaches the browser.
-// NOTE: Windsor's HTTP API ignores filter params for this connector, so we
-// apply campaign/account filtering here after the data comes back.
+// Windsor's HTTP API ignores filter params for this connector, so campaign
+// filtering is applied here after the response comes back — but only when
+// the response rows actually contain a "campaign" field (they don't for
+// ad-level queries, only campaign/adset-level ones).
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -14,15 +16,13 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "WINDSOR_API_KEY not set in Vercel environment variables." });
   }
 
-  // Pull params from the request
   const { fields, date_preset, accounts } = req.query;
 
-  // The campaign filter sent by the dashboard e.g. [["campaign","eq","GT - Traffic - 2026"]]
-  // Windsor ignores this on the HTTP API, so we parse it here and apply it ourselves
+  // Parse the campaign filter value from the filters param
+  // e.g. [["campaign","eq","GT - Traffic - 2026"]] → "GT - Traffic - 2026"
   let campaignFilter = null;
   try {
     const filters = JSON.parse(req.query.filters || "[]");
-    // Find the first ["campaign","eq","<value>"] condition anywhere in the filter array
     const findEq = (arr) => {
       for (const item of arr) {
         if (Array.isArray(item) && item[0] === "campaign" && item[1] === "eq") return item[2];
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     campaignFilter = findEq(filters);
   } catch (_) {}
 
-  // Build the Windsor URL — pass fields, date, and accounts only (filter is handled here)
+  // Build Windsor URL — pass fields, date, and accounts only
   const params = new URLSearchParams();
   params.set("api_key", apiKey);
   if (fields)      params.set("fields", fields);
@@ -56,15 +56,12 @@ export default async function handler(req, res) {
     // Normalise to array
     let data = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : []);
 
-    // Apply campaign filter server-side since Windsor ignores it
-    if (campaignFilter && data.length > 0) {
+    // Only filter by campaign if:
+    // 1. We have a campaign filter value, AND
+    // 2. The first row actually has a "campaign" field
+    // (Ad-level queries don't return campaign field — filtering those would wipe all rows)
+    if (campaignFilter && data.length > 0 && data[0].campaign !== undefined) {
       data = data.filter(row => row.campaign === campaignFilter);
-    }
-
-    // Also restrict to the requested account ID if provided
-    if (accounts && data.length > 0 && data[0].account_id !== undefined) {
-      const accountList = accounts.split(",").map(a => a.trim());
-      data = data.filter(row => accountList.includes(String(row.account_id)));
     }
 
     return res.status(200).json({ data });
