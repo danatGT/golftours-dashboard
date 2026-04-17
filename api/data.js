@@ -1,9 +1,9 @@
 // api/data.js
-// Proxies Windsor.ai requests server-side so WINDSOR_API_KEY never reaches the browser.
-// Windsor's HTTP API ignores filter params for this connector, so campaign
-// filtering is applied here after the response comes back — but only when
-// the response rows actually contain a "campaign" field (they don't for
-// ad-level queries, only campaign/adset-level ones).
+// Proxies Windsor.ai requests server-side.
+// Windsor ignores filter params on this connector's HTTP API, so we:
+// 1. Always request the "campaign" field alongside whatever fields the dashboard asks for
+// 2. Filter rows by campaign name here after the response comes back
+// 3. Strip the "campaign" field back out if the dashboard didn't ask for it
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -16,9 +16,9 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "WINDSOR_API_KEY not set in Vercel environment variables." });
   }
 
-  const { fields, date_preset, accounts } = req.query;
+  const { date_preset, accounts } = req.query;
 
-  // Parse the campaign filter value from the filters param
+  // Parse the campaign name to filter by from the filters param
   // e.g. [["campaign","eq","GT - Traffic - 2026"]] → "GT - Traffic - 2026"
   let campaignFilter = null;
   try {
@@ -33,10 +33,21 @@ export default async function handler(req, res) {
     campaignFilter = findEq(filters);
   } catch (_) {}
 
-  // Build Windsor URL — pass fields, date, and accounts only
+  // Parse the requested fields and always inject "campaign" so we can filter
+  let requestedFields = [];
+  try {
+    requestedFields = (req.query.fields || "").split(",").map(f => f.trim()).filter(Boolean);
+  } catch (_) {}
+
+  const hadCampaignField = requestedFields.includes("campaign");
+  const fieldsToRequest = hadCampaignField
+    ? requestedFields
+    : ["campaign", ...requestedFields];
+
+  // Build Windsor URL
   const params = new URLSearchParams();
   params.set("api_key", apiKey);
-  if (fields)      params.set("fields", fields);
+  params.set("fields", fieldsToRequest.join(","));
   if (date_preset) params.set("date_preset", date_preset);
   if (accounts)    params.set("accounts", accounts);
 
@@ -56,12 +67,14 @@ export default async function handler(req, res) {
     // Normalise to array
     let data = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : []);
 
-    // Only filter by campaign if:
-    // 1. We have a campaign filter value, AND
-    // 2. The first row actually has a "campaign" field
-    // (Ad-level queries don't return campaign field — filtering those would wipe all rows)
-    if (campaignFilter && data.length > 0 && data[0].campaign !== undefined) {
+    // Filter by campaign — now guaranteed to work because we always fetch the campaign field
+    if (campaignFilter) {
       data = data.filter(row => row.campaign === campaignFilter);
+    }
+
+    // Strip "campaign" back out if the dashboard didn't originally ask for it
+    if (!hadCampaignField && data.length > 0) {
+      data = data.map(({ campaign, ...rest }) => rest);
     }
 
     return res.status(200).json({ data });
