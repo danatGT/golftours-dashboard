@@ -5,14 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Golftours.com — GT Ads Dashboard</title>
 
-  <!-- Brand fonts — Forma DJR (sans) + Didot via Google Fonts approximation -->
-  <!-- Forma DJR not on Google Fonts; using DM Sans as closest free match for UI -->
-  <!-- Didot not on Google Fonts; using Playfair Display italic for serif accent -->
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:ital@1&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
   <style>
-    /* ─── BRAND TOKENS (from email) ─────────────────── */
+    /* ─── BRAND TOKENS ─────────────────────────────── */
     :root {
       --cream:        #F6F7ED;
       --forest:       #1B372F;
@@ -34,8 +31,6 @@
       --warn-bg:      #FFF8D6;
       --danger:       #9B2C2C;
       --danger-bg:    #FDEAEA;
-
-      /* Typography matching email */
       --font-sans:   'DM Sans', 'Helvetica Neue', Arial, sans-serif;
       --font-serif:  'Playfair Display', 'Didot', Georgia, 'Times New Roman', serif;
     }
@@ -68,19 +63,8 @@
       z-index: 100;
     }
 
-    .logo {
-      font-family: var(--font-sans);
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: var(--cream);
-    }
-    .logo em {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-weight: 400;
-      color: var(--yellow);
-    }
+    .logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; color: var(--cream); }
+    .logo em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--yellow); }
 
     .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 
@@ -89,10 +73,7 @@
       border: 1px solid rgba(246,247,237,.25);
       border-radius: 20px;
       padding: 5px 14px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
       color: rgba(246,247,237,0.85);
     }
     .live-dot { width:7px; height:7px; border-radius:50%; background:#6FCF97; animation: blink 2s infinite; flex-shrink:0; }
@@ -103,144 +84,55 @@
     main { max-width: 1200px; margin: 0 auto; padding: 48px 48px; }
 
     /* ─── CAMPAIGN TOGGLE ────────────────────────────── */
-    .toggle-bar {
-      display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap;
-    }
+    .toggle-bar { display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap; }
     .tog-btn {
-      padding: 11px 24px;
-      border-radius: var(--rs);
-      font-family: var(--font-sans);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: var(--white);
-      color: var(--muted);
-      transition: all .2s;
+      padding: 11px 24px; border-radius: var(--rs);
+      font-family: var(--font-sans); font-size: 12px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; border: 1px solid var(--border);
+      background: var(--white); color: var(--muted); transition: all .2s;
     }
     .tog-btn:hover { border-color: var(--forest); color: var(--forest); }
     .tog-btn.active { background: var(--forest); color: var(--cream); border-color: var(--forest); }
     .tog-btn.active-brand { background: var(--forest-mid); color: var(--cream); border-color: var(--forest-mid); }
 
-    /* ─── SECTION HEADERS (email style: small overline + large heading) ── */
-    .sec {
-      margin: 48px 0 20px;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
+    /* ─── SECTION HEADERS ────────────────────────────── */
+    .sec { margin: 48px 0 20px; }
     .sec:first-of-type { margin-top: 0; }
-    .sec-overline {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.20em;
-      text-transform: uppercase;
-      color: var(--hint);
-      margin-bottom: 8px;
-    }
-    .sec-title {
-      font-family: var(--font-sans);
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--forest);
-    }
-    .sec-title em {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-weight: 400;
-      color: var(--forest);
-    }
+    .sec-overline { font-size: 10px; font-weight: 700; letter-spacing: 0.20em; text-transform: uppercase; color: var(--hint); margin-bottom: 8px; }
+    .sec-title { font-family: var(--font-sans); font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; color: var(--forest); }
+    .sec-title em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--forest); }
 
     /* ─── KPI GRID ───────────────────────────────────── */
     .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      margin-bottom: 16px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1px; background: var(--border); border: 1px solid var(--border);
+      border-radius: var(--r); overflow: hidden; margin-bottom: 16px;
     }
-    .kpi {
-      background: var(--white);
-      padding: 22px 22px 20px;
-      transition: background .15s;
-    }
+    .kpi { background: var(--white); padding: 22px 22px 20px; transition: background .15s; }
     .kpi:hover { background: #FAFAF8; }
-    .kpi-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--hint);
-      margin-bottom: 8px;
-    }
-    .kpi-value {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      color: var(--forest);
-      line-height: 1;
-    }
+    .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--hint); margin-bottom: 8px; }
+    .kpi-value { font-size: 28px; font-weight: 700; letter-spacing: -0.025em; color: var(--forest); line-height: 1; }
     .kpi-sub { font-size: 11px; color: var(--hint); margin-top: 4px; }
-    .kpi-accent .kpi-value { color: var(--forest); }
-    /* Yellow accent KPIs get dark forest bg */
-    .kpi-dark {
-      background: var(--forest) !important;
-    }
+    .kpi-dark { background: var(--forest) !important; }
     .kpi-dark .kpi-label { color: rgba(246,247,237,0.65); }
     .kpi-dark .kpi-value { color: var(--yellow); }
     .kpi-dark .kpi-sub   { color: rgba(246,247,237,0.5); }
+    .kpi-warn { background: var(--warn-bg) !important; }
+    .kpi-warn .kpi-label { color: var(--warn); }
+    .kpi-warn .kpi-value { color: var(--warn); }
+    .kpi-warn .kpi-sub   { color: var(--warn); opacity: 0.75; }
 
-    /* ─── CALLOUT / INSIGHT BLOCK ────────────────────── */
-    .callout {
-      background: var(--forest);
-      border-radius: var(--r);
-      padding: 24px 28px;
-      margin-bottom: 0;
-    }
-    .callout-overline {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.20em;
-      text-transform: uppercase;
-      color: var(--yellow);
-      margin-bottom: 10px;
-    }
-    .callout p {
-      font-size: 14px;
-      color: rgba(246,247,237,0.82);
-      line-height: 1.75;
-    }
+    /* ─── CALLOUT ────────────────────────────────────── */
+    .callout { background: var(--forest); border-radius: var(--r); padding: 24px 28px; margin-bottom: 0; }
+    .callout-overline { font-size: 10px; font-weight: 700; letter-spacing: 0.20em; text-transform: uppercase; color: var(--yellow); margin-bottom: 10px; }
+    .callout p { font-size: 14px; color: rgba(246,247,237,0.82); line-height: 1.75; }
     .callout strong { color: var(--cream); }
 
     /* ─── AI PANEL ───────────────────────────────────── */
-    .ai-panel {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-    }
-    .ai-panel-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      background: var(--cream);
-    }
-    .ai-panel-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      display: flex; align-items: center; gap: 8px;
-    }
+    .ai-panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .ai-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--cream); }
+    .ai-panel-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
     .ai-dot { width:6px; height:6px; border-radius:50%; background:var(--yellow); flex-shrink:0; }
     .ai-body { padding: 22px 24px; }
     .ai-content { font-size: 14px; color: var(--text); line-height: 1.8; }
@@ -250,80 +142,31 @@
     .ai-loading { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
     .ai-spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--forest); border-radius:50%; animation:spin .7s linear infinite; }
     .refresh-btn {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 5px 12px;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      transition: all .15s;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 12px; cursor: pointer; font-family: var(--font-sans); transition: all .15s;
     }
     .refresh-btn:hover { background: var(--forest); color: var(--cream); border-color: var(--forest); }
 
     /* ─── CARDS ──────────────────────────────────────── */
-    .card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-    }
-    .card-head {
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      background: var(--cream);
-    }
-    .card-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .card-head { padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--cream); }
+    .card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
     .card-body { padding: 24px; }
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
     /* ─── TABLE ──────────────────────────────────────── */
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th {
-      text-align: left;
-      font-weight: 700;
-      color: var(--hint);
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      background: var(--cream);
-    }
-    td {
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      vertical-align: middle;
-    }
+    th { text-align: left; font-weight: 700; color: var(--hint); padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; background: var(--cream); }
+    td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #FAFAF8; }
-
-    /* Version grouping */
     tr.v-group-header td { background: var(--cream); font-weight: 700; font-size: 12px; color: var(--forest); }
     tr.v-row td { background: var(--white); font-size: 12px; }
     tr.v-row td:first-child { padding-left: 28px; color: var(--muted); }
 
     /* ─── BADGES ─────────────────────────────────────── */
-    .badge {
-      display: inline-block;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      letter-spacing: 0.10em;
-    }
+    .badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.10em; }
     .b-win    { background: var(--good-bg);   color: var(--good);   }
     .b-watch  { background: var(--warn-bg);   color: var(--warn);   }
     .b-review { background: var(--danger-bg); color: var(--danger); }
@@ -341,27 +184,14 @@
     /* ─── AUDIENCE ───────────────────────────────────── */
     .gender-bar { display: flex; border-radius: 3px; overflow: hidden; height: 8px; margin: 6px 0 3px; }
     .seg-cards  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
-    .seg-card   {
-      border: 1px solid var(--border);
-      border-radius: var(--rs);
-      padding: 18px 18px 16px;
-      background: var(--white);
-    }
+    .seg-card   { border: 1px solid var(--border); border-radius: var(--rs); padding: 18px 18px 16px; background: var(--white); }
     .seg-rank   { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hint); margin-bottom: 6px; }
     .seg-title  { font-size: 16px; font-weight: 700; color: var(--forest); margin-bottom: 12px; line-height: 1.2; letter-spacing: -0.01em; }
     .seg-stat   { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
     .seg-stat span:last-child { color: var(--text); font-weight: 700; }
 
     /* ─── A/B ────────────────────────────────────────── */
-    .ab-empty {
-      text-align: center;
-      padding: 40px 32px;
-      color: var(--hint);
-      font-size: 13px;
-      border: 2px dashed var(--border);
-      border-radius: var(--rs);
-      background: var(--cream);
-    }
+    .ab-empty { text-align: center; padding: 40px 32px; color: var(--hint); font-size: 13px; border: 2px dashed var(--border); border-radius: var(--rs); background: var(--cream); }
     .ab-empty strong { display: block; font-size: 14px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
 
     /* ─── CHARTS ─────────────────────────────────────── */
@@ -370,119 +200,38 @@
     .leg   { display: flex; align-items: center; gap: 5px; }
     .leg-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-    /* ─── STAT GRID (email-style 3-col bordered) ─────── */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      background: var(--border);
-      gap: 1px;
-    }
-    .stat-cell {
-      background: var(--white);
-      padding: 22px 20px;
-      text-align: center;
-    }
-    .stat-cell-num {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      color: var(--forest);
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-    .stat-cell-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      line-height: 1.4;
-    }
+    /* ─── STAT GRID ──────────────────────────────────── */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; background: var(--border); gap: 1px; }
+    .stat-cell { background: var(--white); padding: 22px 20px; text-align: center; }
+    .stat-cell-num { font-size: 32px; font-weight: 700; letter-spacing: -0.025em; color: var(--forest); line-height: 1; margin-bottom: 8px; }
+    .stat-cell-label { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
 
     /* ─── CREATIVE NOTE ──────────────────────────────── */
-    .creative-note {
-      font-size: 12px;
-      color: var(--muted);
-      padding: 12px 24px;
-      background: rgba(255,228,36,0.10);
-      border-bottom: 1px solid rgba(255,228,36,0.25);
-    }
+    .creative-note { font-size: 12px; color: var(--muted); padding: 12px 24px; background: rgba(255,228,36,0.10); border-bottom: 1px solid rgba(255,228,36,0.25); }
 
     /* ─── HOW-TO ─────────────────────────────────────── */
-    .how-to {
-      background: var(--forest);
-      border-radius: var(--r);
-      padding: 24px 28px;
-      margin-top: 48px;
-    }
-    .how-to h3 {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.20em;
-      text-transform: uppercase;
-      color: rgba(246,247,237,0.65);
-      margin-bottom: 14px;
-    }
+    .how-to { background: var(--forest); border-radius: var(--r); padding: 24px 28px; margin-top: 48px; }
+    .how-to h3 { font-size: 10px; font-weight: 700; letter-spacing: 0.20em; text-transform: uppercase; color: rgba(246,247,237,0.65); margin-bottom: 14px; }
     .how-to ol { padding-left: 18px; color: rgba(246,247,237,0.78); line-height: 2.2; font-size: 13px; }
     .how-to strong { color: var(--cream); }
-    .how-to code {
-      background: rgba(246,247,237,0.12);
-      color: var(--yellow);
-      padding: 1px 7px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 12px;
-    }
+    .how-to code { background: rgba(246,247,237,0.12); color: var(--yellow); padding: 1px 7px; border-radius: 4px; font-family: monospace; font-size: 12px; }
 
     /* ─── REVIEW LIST ────────────────────────────────── */
-    .review-item {
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .review-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
     .review-item:last-child { border-bottom: none; }
     .review-item-name { font-weight: 700; font-size: 13px; color: var(--forest); margin-bottom: 5px; }
     .review-issue { font-size: 12px; color: var(--danger); margin-bottom: 2px; }
 
     /* ─── LOADING / ERROR ────────────────────────────── */
-    .error-msg {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border-radius: var(--rs);
-      border: 1px solid rgba(155,44,44,.15);
-      padding: 16px 20px;
-      font-size: 13px;
-      margin-bottom: 24px;
-      display: none;
-      line-height: 1.7;
-    }
-    .loading {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 300px; color: var(--muted); font-size: 14px; gap: 12px;
-    }
-    .spinner {
-      width: 20px; height: 20px;
-      border: 2px solid var(--border); border-top-color: var(--forest);
-      border-radius: 50%; animation: spin .7s linear infinite;
-    }
+    .error-msg { background: var(--danger-bg); color: var(--danger); border-radius: var(--rs); border: 1px solid rgba(155,44,44,.15); padding: 16px 20px; font-size: 13px; margin-bottom: 24px; display: none; line-height: 1.7; }
+    .loading { display: flex; align-items: center; justify-content: center; min-height: 300px; color: var(--muted); font-size: 14px; gap: 12px; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--forest); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── SPACER ─────────────────────────────────────── */
     .spacer { margin-bottom: 16px; }
 
     /* ─── FOOTER ─────────────────────────────────────── */
-    footer {
-      background: var(--forest-deep);
-      margin-top: 64px;
-      padding: 32px 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+    footer { background: var(--forest-deep); margin-top: 64px; padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
     footer p { font-size: 11px; color: rgba(246,247,237,0.45); letter-spacing: 0.04em; }
     footer a { color: rgba(246,247,237,0.45); text-decoration: none; }
 
@@ -500,7 +249,7 @@
   <div class="header-right">
     <div class="live-pill">
       <span class="live-dot"></span>
-      <span id="pill-label">GT Traffic 2026</span>
+      <span id="pill-label">GT Enquiries 2026</span>
     </div>
     <span id="last-updated">Loading…</span>
   </div>
@@ -513,7 +262,7 @@
 
     <!-- Campaign toggle -->
     <div class="toggle-bar">
-      <button class="tog-btn active"  id="btn-traffic"   onclick="switchCampaign('traffic')">GT Traffic 2026</button>
+      <button class="tog-btn active"  id="btn-traffic"   onclick="switchCampaign('traffic')">GT Enquiries 2026</button>
       <button class="tog-btn"         id="btn-awareness" onclick="switchCampaign('awareness')">GT Brand Awareness 2026</button>
     </div>
 
@@ -644,9 +393,10 @@
     <div class="how-to">
       <h3>Using this dashboard</h3>
       <ol>
-        <li>Use the toggle buttons above to switch between <strong>GT Traffic 2026</strong> and <strong>GT Brand Awareness 2026</strong>.</li>
-        <li>Brand Awareness shows Reach, Frequency and CPM instead of CTR / CPC.</li>
+        <li>Use the toggle buttons above to switch between <strong>GT Enquiries 2026</strong> and <strong>GT Brand Awareness 2026</strong>.</li>
+        <li>Brand Awareness shows Reach, Frequency and CPM instead of CTR / CPC / Cost per Enquiry.</li>
         <li>Name updated creatives with <code>v2</code>, <code>v3</code> etc. and they group automatically.</li>
+        <li>Ad set names like <code>GT - USA East Coast - Bay Hill</code> display as-is in all tables.</li>
         <li>Name A/B variants with suffix <code>Ad Name - A</code> / <code>Ad Name - B</code> to surface them in section 07.</li>
       </ol>
     </div>
@@ -669,15 +419,21 @@
    ════════════════════════════════════════════════════ */
 const ACCOUNT_ID = "532007480578438";
 const CAMPAIGNS = {
-  traffic:   [["campaign","eq","GT - Traffic - 2026"]],
+  // ── CHANGED: GT - Traffic - 2026 → GT - Enquiries - 2026 ──
+  traffic:   [["campaign","eq","GT - Enquiries - 2026"]],
   awareness: [["campaign","eq","GT - Brand Awareness - 2026"]]
 };
 
 let activeCampaign = "traffic";
 let currentData    = {};
 
-const BENCH_T = { ctr:0.025, cpc:0.70, freq:1.8 };
-const BENCH_B = { cpm:5.00,  freq:3.0  };
+// ── CHANGED: benchmarks updated for Leads/Enquiries objective ──
+// CTR: lowered from 0.025 → 0.015 (Leads campaigns optimise for a narrower audience, lower CTR is normal)
+// CPC: raised from 0.70 → 2.50 (Meta chases a rarer event; raw CPC rises significantly)
+// CPE: cost per enquiry target range £25–£50
+// freq / bench_b unchanged
+const BENCH_T = { ctr: 0.015, cpc: 2.50, freq: 1.8, cpe_warn: 80 };
+const BENCH_B = { cpm: 5.00,  freq: 3.0 };
 
 /* ════════════════════════════════════════════════════
    HELPERS
@@ -701,6 +457,8 @@ function showError(msg){
   e.style.display="block";
   e.innerHTML="<strong>Could not load data.</strong><br>"+msg;
 }
+
+// ── CHANGED: signal() thresholds use updated BENCH_T ──
 function signal(ctr,cpc){
   if(ctr>=BENCH_T.ctr*1.5&&cpc<=BENCH_T.cpc*0.8) return'<span class="badge b-win">Winner</span>';
   if(ctr<BENCH_T.ctr*0.6||cpc>BENCH_T.cpc*1.5)   return'<span class="badge b-review">Review</span>';
@@ -711,10 +469,18 @@ function signalBrand(cpm){
   if(cpm>BENCH_B.cpm)      return'<span class="badge b-watch">Watch CPM</span>';
   return'<span class="badge b-win">On Track</span>';
 }
+// ── NEW: signal for Cost per Enquiry ──
+function signalCpe(cpe){
+  if(cpe===0)       return'<span class="badge b-new">No data yet</span>';
+  if(cpe<=50)       return'<span class="badge b-win">On target</span>';
+  if(cpe<=BENCH_T.cpe_warn) return'<span class="badge b-watch">Watch</span>';
+  return'<span class="badge b-review">Review</span>';
+}
 function daysSince(s){
   if(!s) return 0;
   return Math.max(1,Math.round((Date.now()-new Date(s))/864e5));
 }
+// ── baseName() unchanged — already handles GT - USA East Coast - Bay Hill style names correctly ──
 function baseName(name){
   return name
     .replace(/^Test\s*[-–]\s*/i,"")
@@ -737,7 +503,8 @@ function switchCampaign(name){
   document.querySelectorAll(".tog-btn").forEach(b=>b.classList.remove("active","active-brand"));
   const btn=document.getElementById("btn-"+name);
   btn.classList.add(name==="awareness"?"active-brand":"active");
-  document.getElementById("pill-label").textContent=name==="awareness"?"GT Brand Awareness 2026":"GT Traffic 2026";
+  // ── CHANGED: pill label updated ──
+  document.getElementById("pill-label").textContent=name==="awareness"?"GT Brand Awareness 2026":"GT Enquiries 2026";
   document.getElementById("error-msg").style.display="none";
   document.getElementById("dashboard").style.display="none";
   document.getElementById("loading").style.display="flex";
@@ -790,6 +557,7 @@ async function generateAIInsights(){
     .map(a=>`${a.ad_name}: CTR ${pct(a.ctr)}, CPC ${GBP(a.cpc,3)}, ${ob(a)} outbound clicks`)
     .join("; ");
 
+  // ── CHANGED: Enquiries prompt updated with correct objective, benchmarks and CPE metric ──
   const prompt=isAwareness
     ?`You are a paid advertising specialist reviewing a Meta Brand Awareness campaign for Golftours.com, a premium golf travel company.
 
@@ -798,14 +566,19 @@ Total spend: ${GBP(d.agg.spend,2)} | Impressions: ${fmtM(d.agg.imp)} | Reach: ${
 Ad sets: ${adsetSummary}
 
 Write 4-5 concise sentences covering: how efficiently they are reaching new audiences (CPM and reach), whether frequency is healthy, which ad sets are building most brand awareness, and 2 specific actionable recommendations. Do NOT mention CTR or CPC. Write in plain English for a non-technical business owner. Use **bold** for key figures.`
-    :`You are a paid advertising specialist reviewing a Meta Traffic campaign for Golftours.com, a premium golf travel company.
+    :`You are a paid advertising specialist reviewing a Meta Leads/Enquiries campaign for Golftours.com, a premium golf travel company.
 
-Campaign: GT Traffic 2026
-Total spend: ${GBP(d.agg.spend,2)} | Impressions: ${fmtM(d.agg.imp)} | Clicks: ${fmtK(d.agg.clicks)} | CTR: ${pct(d.agg.ctr)} | CPC: ${GBP(d.agg.cpc,3)} | Outbound clicks: ${fmtK(d.agg.ob)} | Frequency: ${d.agg.freq.toFixed(2)}x | Days active: ${d.days}
+Campaign: GT Enquiries 2026 (objective: website enquiries — sends traffic to the golftours.com enquiry page)
+Total spend: ${GBP(d.agg.spend,2)} | Impressions: ${fmtM(d.agg.imp)} | Clicks: ${fmtK(d.agg.clicks)} | CTR: ${pct(d.agg.ctr)} | CPC: ${GBP(d.agg.cpc,3)} | Cost per Enquiry: ${d.agg.cpe>0?GBP(d.agg.cpe,2):"not yet available"} | Outbound clicks: ${fmtK(d.agg.ob)} | Frequency: ${d.agg.freq.toFixed(2)}x | Days active: ${d.days}
 Top ads: ${topAds}
 Ad sets: ${adsetSummary}
 
-Write 4-5 concise sentences covering: overall efficiency vs travel benchmarks (CTR ~2.5%, CPC £0.50–0.80), best and worst performing ads/ad sets, any creative fatigue concerns, and 2-3 specific actionable recommendations. Write in plain English for a non-technical business owner. Use **bold** for key figures.`;
+IMPORTANT CONTEXT: This is a Leads/Enquiries objective campaign, not a Traffic campaign. Expected benchmarks are different:
+- CTR benchmark is ~1.5% (lower than traffic campaigns because Meta shows ads to a narrower, higher-intent audience)
+- CPC will be higher (£2–£5 range is normal) because Meta is optimising for enquiry submissions, not clicks
+- The key metric is Cost per Enquiry (target: £25–£50). Above £80 sustained indicates a structural problem, usually the landing page.
+
+Write 4-5 concise sentences covering: overall efficiency vs these Leads campaign benchmarks, best and worst performing ad sets, Cost per Enquiry if data is available, any creative fatigue concerns, and 2-3 specific actionable recommendations. Write in plain English for a non-technical business owner. Use **bold** for key figures.`;
 
   try{
     const res=await fetch("/api/ai",{
@@ -861,11 +634,15 @@ function buildAdsetTable(adsets,isAwareness){
     });
     return h+"</tbody></table>";
   }else{
+    // ── CHANGED: added Cost per Enquiry column to ad set table ──
     let h=`<table><thead><tr>
       <th>Ad set</th><th>Status</th><th>Spend</th>
-      <th>CTR</th><th>CPC</th><th>Out. clicks</th><th>Days</th><th>Freq.</th><th>Signal</th>
+      <th>CTR</th><th>CPC</th><th>Cost/Enquiry</th><th>Out. clicks</th><th>Days</th><th>Freq.</th><th>Signal</th>
     </tr></thead><tbody>`;
     adsets.forEach(a=>{
+      // Cost per enquiry: spend / outbound clicks (best proxy until pixel fires on lead event)
+      const outClicks=ob(a);
+      const cpe=outClicks?+a.spend/outClicks:0;
       const sb=a.adset_effective_status==="ACTIVE"
         ?'<span class="badge b-active">Active</span>'
         :`<span class="badge b-paused">${a.adset_effective_status||"—"}</span>`;
@@ -874,7 +651,8 @@ function buildAdsetTable(adsets,isAwareness){
         <td>${GBP(+a.spend,2)}</td>
         <td style="${a.ctr>=BENCH_T.ctr?"color:var(--good);font-weight:700":a.ctr<BENCH_T.ctr*.5?"color:var(--danger)":""}">${pct(a.ctr)}</td>
         <td>${GBP(a.cpc,3)}</td>
-        <td style="font-weight:700">${ob(a).toLocaleString()}</td>
+        <td style="${cpe>BENCH_T.cpe_warn&&cpe>0?"color:var(--danger);font-weight:700":cpe>0&&cpe<=50?"color:var(--good);font-weight:700":""}">${cpe>0?GBP(cpe,2):"—"}</td>
+        <td style="font-weight:700">${outClicks.toLocaleString()}</td>
         <td style="color:var(--hint)">${a.days}d</td>
         <td style="${+a.frequency>=BENCH_T.freq?"color:var(--danger);font-weight:700":""}">${Number(a.frequency||0).toFixed(2)}×</td>
         <td>${signal(a.ctr,a.cpc)}</td>
@@ -1021,6 +799,8 @@ async function render(){
     agg.cpm =agg.imp    ?agg.spend/agg.imp*1000:0;
     agg.freq=agg.reach  ?agg.imp/agg.reach     :0;
     agg.cobc=agg.ob     ?agg.spend/agg.ob      :0;
+    // ── NEW: Cost per Enquiry — uses outbound clicks as proxy until pixel lead event fires ──
+    agg.cpe =agg.ob     ?agg.spend/agg.ob      :0;
 
     const days=[...new Set(safe(dailyData).map(r=>r.date))].sort().length;
 
@@ -1062,24 +842,34 @@ async function render(){
         `Each person sees the ad an average of <strong>${agg.freq.toFixed(2)}×</strong> — ${freqNote}. `+
         `CPM of <strong>${GBP(agg.cpm,2)}</strong> is ${agg.cpm<5?"efficient for awareness spend":"above average — consider testing different placements or audiences"}.`;
     }else{
-      document.getElementById("sec-kpi-overline").textContent="Performance";
+      // ── CHANGED: Enquiries KPI tiles — updated bench note, added Cost per Enquiry tile ──
+      document.getElementById("sec-kpi-overline").textContent="Enquiries Performance";
       document.getElementById("sec-kpi-title").innerHTML='Key results at a <em>glance</em>.';
-      document.getElementById("bench-note").textContent="Travel benchmarks: CTR ~2.5% · CPC £0.40–0.80 · Frequency warning over 1.8×";
+      document.getElementById("bench-note").textContent="Enquiries benchmarks: CTR ~1.5% · CPC £2–£5 normal · Cost per Enquiry target £25–£50 · Frequency warning over 1.8×";
+
+      const cpeClass=agg.cpe>BENCH_T.cpe_warn&&agg.cpe>0?"kpi kpi-warn":"kpi kpi-dark";
+      const cpeSub=agg.cpe===0?"Awaiting enquiry data":agg.cpe<=50?"On target (£25–£50)":agg.cpe<=BENCH_T.cpe_warn?"Watch — approaching limit":"Above £80 — review landing page";
+
       kpiGrid.innerHTML=`
         <div class="kpi"><div class="kpi-label">Total Spend</div><div class="kpi-value">${GBP(agg.spend,2)}</div><div class="kpi-sub">${days} day${days!==1?"s":""} active</div></div>
         <div class="kpi"><div class="kpi-label">Impressions</div><div class="kpi-value">${fmtM(agg.imp)}</div></div>
         <div class="kpi"><div class="kpi-label">Total Clicks</div><div class="kpi-value">${fmtK(agg.clicks)}</div></div>
-        <div class="kpi"><div class="kpi-label">Click-Through Rate</div><div class="kpi-value">${pct(agg.ctr)}</div></div>
+        <div class="kpi"><div class="kpi-label">Click-Through Rate</div><div class="kpi-value">${pct(agg.ctr)}</div><div class="kpi-sub">Benchmark ~1.5%</div></div>
         <div class="kpi"><div class="kpi-label">Avg. CPM</div><div class="kpi-value">${GBP(agg.cpm,2)}</div></div>
         <div class="kpi"><div class="kpi-label">Unique Reach</div><div class="kpi-value">${fmtM(agg.reach)}</div></div>
-        <div class="kpi kpi-dark"><div class="kpi-label">Cost Per Click</div><div class="kpi-value">${GBP(agg.cpc,3)}</div><div class="kpi-sub">Avg across all ads</div></div>
+        <div class="kpi kpi-dark"><div class="kpi-label">Cost Per Click</div><div class="kpi-value">${GBP(agg.cpc,3)}</div><div class="kpi-sub">£2–£5 normal for Leads</div></div>
         <div class="kpi"><div class="kpi-label">Frequency</div><div class="kpi-value">${agg.freq.toFixed(2)}×</div><div class="kpi-sub">Impressions per person</div></div>
         <div class="kpi kpi-dark"><div class="kpi-label">Outbound Clicks</div><div class="kpi-value">${fmtK(agg.ob)}</div><div class="kpi-sub">Off-Facebook traffic</div></div>
-        <div class="kpi kpi-dark"><div class="kpi-label">Cost / Outbound</div><div class="kpi-value">${GBP(agg.cobc,3)}</div><div class="kpi-sub">True traffic cost</div></div>`;
+        <div class="${cpeClass}"><div class="kpi-label">Cost / Enquiry</div><div class="kpi-value">${agg.cpe>0?GBP(agg.cpe,2):"—"}</div><div class="kpi-sub">${cpeSub}</div></div>`;
+
+      // ── CHANGED: insight text updated for Enquiries objective ──
       document.getElementById("insight-kpi").innerHTML=
         `Campaign has spent <strong>${GBP(agg.spend,2)}</strong> reaching <strong>${fmtM(agg.reach)}</strong> unique people over <strong>${days} day${days!==1?"s":""}</strong>. `+
-        `CTR is <strong>${pct(agg.ctr)}</strong> — <strong>${agg.ctr>=BENCH_T.ctr?"above":"below"}</strong> the travel industry benchmark of ~2.5%. `+
-        `Cost per click of <strong>${GBP(agg.cpc,3)}</strong> is <strong>${agg.cpc<=BENCH_T.cpc?"below":"above"}</strong> the typical range. `+
+        `CTR is <strong>${pct(agg.ctr)}</strong> — <strong>${agg.ctr>=BENCH_T.ctr?"above":"below"}</strong> the Leads campaign benchmark of ~1.5% (lower than Traffic campaigns is expected). `+
+        `Cost per click of <strong>${GBP(agg.cpc,3)}</strong> — a higher CPC than Traffic campaigns is normal as Meta optimises for enquiry submissions, not clicks. `+
+        (agg.cpe>0
+          ?`Cost per Enquiry is <strong>${GBP(agg.cpe,2)}</strong> — ${agg.cpe<=50?"<strong style='color:#6FCF97'>within target range (£25–£50)</strong>":agg.cpe<=BENCH_T.cpe_warn?"approaching the £80 warning threshold — monitor closely":"<strong style='color:#e07070'>above £80 — likely a landing page issue, review the enquiry page</strong>"}. `
+          :`Cost per Enquiry not yet available — check back once enquiries start flowing. `)+
         `Frequency of <strong>${agg.freq.toFixed(2)}×</strong> is ${agg.freq>=BENCH_T.freq?"<strong style='color:#e07070'>elevated — consider refreshing creative soon</strong>":"healthy — audiences are not being over-served"}.`;
     }
 
@@ -1109,9 +899,10 @@ async function render(){
         y2:{position:"right",ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#8A9691",callback:v=>"£"+v},grid:{display:false}}
       }}});
     }else{
+      // ── CHANGED: trend chart for Enquiries — CTR benchmark line lowered to 1.5% ──
       document.getElementById("trendLegend").innerHTML=`
         <span class="leg"><span class="leg-sq" style="background:var(--forest)"></span>Spend</span>
-        <span class="leg"><span class="leg-sq" style="background:var(--yellow);border-radius:0"></span>CTR %</span>
+        <span class="leg"><span class="leg-sq" style="background:var(--yellow);border-radius:0"></span>CTR % (benchmark 1.5%)</span>
         <span class="leg"><span class="leg-sq" style="background:rgba(27,55,47,.3);border:1px dashed #1B372F;border-radius:0"></span>CPM</span>`;
       makeChart("trendChart",{data:{labels:lblDate,datasets:[
         {type:"bar", label:"Spend",data:sd.map(d=>+dm[d].spend.toFixed(2)),backgroundColor:"rgba(27,55,47,.6)",borderColor:"#1B372F",borderWidth:1,yAxisID:"y",borderRadius:3},
@@ -1146,7 +937,12 @@ async function render(){
         return (imp?+a.spend/imp*1000:0)>BENCH_B.cpm||(rch?imp/rch:0)>BENCH_B.freq;
       });
     }else{
-      toReview=adsets.filter(a=>a.ctr<BENCH_T.ctr*.8||a.cpc>BENCH_T.cpc*1.2||+a.frequency>=BENCH_T.freq);
+      // ── CHANGED: review thresholds use updated BENCH_T; CPC threshold raised for Leads ──
+      toReview=adsets.filter(a=>{
+        const outClicks=ob(a);
+        const cpe=outClicks?+a.spend/outClicks:0;
+        return a.ctr<BENCH_T.ctr*.8||a.cpc>BENCH_T.cpc*1.5||+a.frequency>=BENCH_T.freq||(cpe>BENCH_T.cpe_warn&&cpe>0);
+      });
     }
     if(!toReview.length){
       reviewEl.innerHTML='<p style="font-size:13px;color:var(--good);font-weight:700">All ad sets within acceptable ranges.</p>';
@@ -1159,9 +955,12 @@ async function render(){
           if(cp>BENCH_B.cpm)  issues.push(`CPM ${GBP(cp,2)} is above £5.00 benchmark`);
           if(fr>BENCH_B.freq) issues.push(`Frequency ${fr.toFixed(2)}× — audience fatigue risk`);
         }else{
-          if(a.ctr<BENCH_T.ctr*.8)       issues.push(`CTR ${pct(a.ctr)} is below benchmark`);
-          if(a.cpc>BENCH_T.cpc*1.2)       issues.push(`CPC ${GBP(a.cpc,3)} is above benchmark`);
-          if(+a.frequency>=BENCH_T.freq)  issues.push(`Frequency ${Number(a.frequency||0).toFixed(2)}× — audience fatigue risk`);
+          const outClicks=ob(a);
+          const cpe=outClicks?+a.spend/outClicks:0;
+          if(a.ctr<BENCH_T.ctr*.8)            issues.push(`CTR ${pct(a.ctr)} is below the 1.5% Leads benchmark`);
+          if(a.cpc>BENCH_T.cpc*1.5)           issues.push(`CPC ${GBP(a.cpc,3)} is above the normal Leads range (£2–£5)`);
+          if(+a.frequency>=BENCH_T.freq)      issues.push(`Frequency ${Number(a.frequency||0).toFixed(2)}× — audience fatigue risk`);
+          if(cpe>BENCH_T.cpe_warn&&cpe>0)     issues.push(`Cost per Enquiry ${GBP(cpe,2)} is above £80 — check landing page`);
         }
         reviewEl.innerHTML+=`<div class="review-item">
           <div class="review-item-name">${a.adset_name}</div>
@@ -1259,7 +1058,7 @@ async function render(){
 
     document.getElementById("segCards").innerHTML=[
       {rank:"01 · Best CTR",title:bestAge+" year olds",   note:"Best click-through rate",       ctr:pct(bestCtr),  spend:GBP(ageTotals[bestAge]?.spend||0,0),   clicks:(ageTotals[bestAge]?.clicks||0).toLocaleString()},
-      {rank:"02 · Dominant spend",title:"Male audience",         note:"Highest budget allocation", ctr:pct(mCtr),     spend:GBP(totM,0),                            clicks:mClicks.toLocaleString()},
+      {rank:"02 · Dominant spend",title:"Male audience",  note:"Highest budget allocation",     ctr:pct(mCtr),     spend:GBP(totM,0),                            clicks:mClicks.toLocaleString()},
       {rank:"03 · Top spend",title:topSpendAge+" (highest spend)",note:"Most budget spent here",ctr:pct(ageTotals[topSpendAge]?ageTotals[topSpendAge].clicks/(ageTotals[topSpendAge].imp||1):0),spend:GBP(topSpend,0),clicks:(ageTotals[topSpendAge]?.clicks||0).toLocaleString()}
     ].map(s=>`<div class="seg-card">
       <div class="seg-rank">${s.rank}</div>
