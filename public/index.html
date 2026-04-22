@@ -4,22 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Golftours.com — GT Ads Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
+
+  <!-- Brand fonts — Forma DJR (sans) + Didot via Google Fonts approximation -->
+  <!-- Forma DJR not on Google Fonts; using DM Sans as closest free match for UI -->
+  <!-- Didot not on Google Fonts; using Playfair Display italic for serif accent -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:ital@1&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
   <style>
-    /* ─── BRAND TOKENS ────────────────────────────── */
+    /* ─── BRAND TOKENS (from email) ─────────────────── */
     :root {
       --cream:        #F6F7ED;
       --forest:       #1B372F;
+      --forest-deep:  #0F2820;
       --forest-mid:   #2C5446;
       --forest-lt:    #C8D8D4;
       --forest-faint: #E8EEEC;
       --yellow:       #FFE424;
-      --text:         #0D2E26;
-      --muted:        #4A6B63;
-      --hint:         #7A9D95;
-      --border:       rgba(27,55,47,0.13);
-      --r:            14px;
+      --text:         #1B372F;
+      --muted:        #5B6E68;
+      --hint:         #8A9691;
+      --border:       #D9DDCE;
+      --white:        #FFFFFF;
+      --r:            10px;
       --rs:           8px;
       --good:         #1A5C4E;
       --good-bg:      #E2EFE7;
@@ -27,238 +34,473 @@
       --warn-bg:      #FFF8D6;
       --danger:       #9B2C2C;
       --danger-bg:    #FDEAEA;
+
+      /* Typography matching email */
+      --font-sans:   'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+      --font-serif:  'Playfair Display', 'Didot', Georgia, 'Times New Roman', serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Didact Gothic', Georgia, sans-serif;
+      font-family: var(--font-sans);
       background: var(--cream);
       color: var(--text);
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.55;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ─── HEADER ──────────────────────────────────── */
+    /* ─── HEADER ─────────────────────────────────────── */
     header {
       background: var(--forest);
-      padding: 0 36px;
+      padding: 0 48px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      min-height: 58px;
+      min-height: 60px;
       border-bottom: 3px solid var(--yellow);
       position: sticky;
       top: 0;
       z-index: 100;
     }
-    .logo { font-size: 20px; letter-spacing: .5px; color: var(--cream); }
-    .logo-dot { color: var(--yellow); }
-    .header-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .live-pill {
-      display: flex; align-items: center; gap: 6px;
-      background: rgba(246,247,237,.12);
-      border: 1px solid rgba(246,247,237,.2);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 12px;
+
+    .logo {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
       color: var(--cream);
     }
-    .live-dot { width:7px; height:7px; border-radius:50%; background:#6FCF97; animation: blink 2s infinite; }
+    .logo em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--yellow);
+    }
+
+    .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+    .live-pill {
+      display: flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(246,247,237,.25);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(246,247,237,0.85);
+    }
+    .live-dot { width:7px; height:7px; border-radius:50%; background:#6FCF97; animation: blink 2s infinite; flex-shrink:0; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-    #last-updated { font-size:12px; color:var(--forest-lt); }
+    #last-updated { font-size:11px; color:rgba(246,247,237,0.55); letter-spacing:0.04em; }
 
-    /* ─── LAYOUT ──────────────────────────────────── */
-    main { max-width:1240px; margin:0 auto; padding:32px 24px; }
+    /* ─── LAYOUT ─────────────────────────────────────── */
+    main { max-width: 1200px; margin: 0 auto; padding: 48px 48px; }
 
-    /* ─── TOGGLE ──────────────────────────────────── */
-    .toggle-bar { display:flex; gap:10px; margin-bottom:28px; flex-wrap:wrap; }
+    /* ─── CAMPAIGN TOGGLE ────────────────────────────── */
+    .toggle-bar {
+      display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap;
+    }
     .tog-btn {
-      padding:10px 22px; border-radius:var(--rs);
-      font-size:13px; cursor:pointer; font-family:inherit;
-      border:1px solid var(--border);
-      background:var(--forest-faint); color:var(--forest);
-      transition:all .2s;
+      padding: 11px 24px;
+      border-radius: var(--rs);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--muted);
+      transition: all .2s;
     }
-    .tog-btn.active       { background:var(--forest);     color:var(--cream); border-color:var(--forest); }
-    .tog-btn.active-brand { background:var(--forest-mid); color:var(--cream); border-color:var(--forest-mid); }
+    .tog-btn:hover { border-color: var(--forest); color: var(--forest); }
+    .tog-btn.active { background: var(--forest); color: var(--cream); border-color: var(--forest); }
+    .tog-btn.active-brand { background: var(--forest-mid); color: var(--cream); border-color: var(--forest-mid); }
 
-    /* ─── SECTION LABELS ──────────────────────────── */
+    /* ─── SECTION HEADERS (email style: small overline + large heading) ── */
     .sec {
-      display:flex; align-items:baseline; gap:10px;
-      margin:32px 0 16px;
-      border-bottom:1px solid var(--border);
-      padding-bottom:10px;
+      margin: 48px 0 20px;
+      padding-bottom: 0;
+      border-bottom: none;
     }
-    .sec:first-of-type { margin-top:0; }
-    .sec-num {
-      font-size:12px; color:var(--yellow); font-weight:600;
-      background:var(--forest); padding:2px 7px; border-radius:4px;
+    .sec:first-of-type { margin-top: 0; }
+    .sec-overline {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--hint);
+      margin-bottom: 8px;
     }
-    .sec-title { font-size:17px; color:var(--forest); }
+    .sec-title {
+      font-family: var(--font-sans);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--forest);
+    }
+    .sec-title em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--forest);
+    }
 
-    /* ─── KPI GRID ────────────────────────────────── */
+    /* ─── KPI GRID ───────────────────────────────────── */
     .kpi-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(136px,1fr));
-      gap:10px;
-      margin-bottom:16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 16px;
     }
-    .kpi { background:var(--forest); border-radius:var(--rs); padding:14px 16px; }
-    .kpi-label { font-size:10px; color:var(--forest-lt); text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
-    .kpi-value { font-size:24px; color:var(--cream); line-height:1.1; }
-    .kpi-sub   { font-size:11px; color:var(--hint); margin-top:3px; }
-    .kpi-accent .kpi-value { color:var(--yellow); }
+    .kpi {
+      background: var(--white);
+      padding: 22px 22px 20px;
+      transition: background .15s;
+    }
+    .kpi:hover { background: #FAFAF8; }
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--hint);
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--forest);
+      line-height: 1;
+    }
+    .kpi-sub { font-size: 11px; color: var(--hint); margin-top: 4px; }
+    .kpi-accent .kpi-value { color: var(--forest); }
+    /* Yellow accent KPIs get dark forest bg */
+    .kpi-dark {
+      background: var(--forest) !important;
+    }
+    .kpi-dark .kpi-label { color: rgba(246,247,237,0.65); }
+    .kpi-dark .kpi-value { color: var(--yellow); }
+    .kpi-dark .kpi-sub   { color: rgba(246,247,237,0.5); }
 
-    /* ─── CALLOUT ─────────────────────────────────── */
-    .callout { background:var(--forest); border-radius:var(--rs); padding:16px 20px; margin-bottom:24px; }
-    .callout-label { font-size:10px; color:var(--yellow); text-transform:uppercase; letter-spacing:.1em; margin-bottom:8px; }
-    .callout p { font-size:13px; color:var(--forest-lt); line-height:1.75; }
-    .callout strong { color:var(--cream); }
+    /* ─── CALLOUT / INSIGHT BLOCK ────────────────────── */
+    .callout {
+      background: var(--forest);
+      border-radius: var(--r);
+      padding: 24px 28px;
+      margin-bottom: 0;
+    }
+    .callout-overline {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 10px;
+    }
+    .callout p {
+      font-size: 14px;
+      color: rgba(246,247,237,0.82);
+      line-height: 1.75;
+    }
+    .callout strong { color: var(--cream); }
 
-    /* ─── AI PANEL ────────────────────────────────── */
+    /* ─── AI PANEL ───────────────────────────────────── */
     .ai-panel {
-      background:#fff; border:1px solid var(--border);
-      border-radius:var(--r); padding:20px 22px; margin-bottom:24px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
     }
-    .ai-panel-header {
-      display:flex; align-items:center;
-      justify-content:space-between;
-      margin-bottom:14px;
+    .ai-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
     }
-    .ai-panel-title {
-      font-size:10px; color:var(--muted);
-      text-transform:uppercase; letter-spacing:.1em;
-      display:flex; align-items:center; gap:6px;
+    .ai-panel-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
     }
-    .ai-dot { width:6px; height:6px; border-radius:50%; background:var(--yellow); }
-    .ai-content { font-size:13px; color:var(--text); line-height:1.8; }
-    .ai-content p { margin-bottom:10px; }
-    .ai-content p:last-child { margin-bottom:0; }
-    .ai-content strong { color:var(--forest); }
+    .ai-dot { width:6px; height:6px; border-radius:50%; background:var(--yellow); flex-shrink:0; }
+    .ai-body { padding: 22px 24px; }
+    .ai-content { font-size: 14px; color: var(--text); line-height: 1.8; }
+    .ai-content p { margin-bottom: 10px; }
+    .ai-content p:last-child { margin-bottom: 0; }
+    .ai-content strong { color: var(--forest); font-weight: 700; }
     .ai-loading { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
-    .ai-spinner {
-      width:14px; height:14px;
-      border:2px solid var(--forest-faint); border-top-color:var(--forest);
-      border-radius:50%; animation:spin .7s linear infinite;
-    }
+    .ai-spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--forest); border-radius:50%; animation:spin .7s linear infinite; }
     .refresh-btn {
-      font-size:11px; color:var(--muted);
-      background:none; border:1px solid var(--border);
-      border-radius:var(--rs); padding:4px 10px;
-      cursor:pointer; font-family:inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all .15s;
     }
-    .refresh-btn:hover { background:var(--forest-faint); }
+    .refresh-btn:hover { background: var(--forest); color: var(--cream); border-color: var(--forest); }
 
-    /* ─── CARDS ───────────────────────────────────── */
-    .card { background:#fff; border:1px solid var(--border); border-radius:var(--r); padding:20px 22px; }
-    .card-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; }
-    .two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    /* ─── CARDS ──────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
+    }
+    .card-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .card-body { padding: 24px; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-    /* ─── TABLE ───────────────────────────────────── */
-    table { width:100%; border-collapse:collapse; font-size:13px; }
+    /* ─── TABLE ──────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th {
-      text-align:left; font-weight:400; color:var(--hint);
-      padding:6px 10px; border-bottom:1px solid var(--border);
-      font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+      text-align: left;
+      font-weight: 700;
+      color: var(--hint);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      background: var(--cream);
     }
-    td { padding:8px 10px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; }
-    tr:last-child td { border-bottom:none; }
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFAF8; }
 
-    /* version grouping */
-    tr.v-group-header td { background:var(--forest-faint); font-weight:500; font-size:12px; color:var(--forest); }
-    tr.v-row td { background:#FAFAF8; font-size:12px; }
-    tr.v-row td:first-child { padding-left:24px; color:var(--muted); }
+    /* Version grouping */
+    tr.v-group-header td { background: var(--cream); font-weight: 700; font-size: 12px; color: var(--forest); }
+    tr.v-row td { background: var(--white); font-size: 12px; }
+    tr.v-row td:first-child { padding-left: 28px; color: var(--muted); }
 
-    /* ─── BADGES ──────────────────────────────────── */
+    /* ─── BADGES ─────────────────────────────────────── */
     .badge {
-      display:inline-block; font-size:10px;
-      padding:2px 8px; border-radius:4px;
-      font-weight:500; text-transform:uppercase; letter-spacing:.05em;
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
     }
-    .b-win    { background:var(--good-bg);   color:var(--good);   }
-    .b-watch  { background:var(--warn-bg);   color:var(--warn);   }
-    .b-review { background:var(--danger-bg); color:var(--danger); }
-    .b-paused { background:#F0F0EE;          color:#888;          }
-    .b-new    { background:rgba(255,228,36,.2); color:#6A5800;    }
+    .b-win    { background: var(--good-bg);   color: var(--good);   }
+    .b-watch  { background: var(--warn-bg);   color: var(--warn);   }
+    .b-review { background: var(--danger-bg); color: var(--danger); }
+    .b-paused { background: #F0F0EE;          color: #888;          }
+    .b-new    { background: rgba(255,228,36,.25); color: #5a4b00;   }
+    .b-active { background: #E2EFE7; color: var(--good); }
 
-    /* ─── FATIGUE ─────────────────────────────────── */
-    .fatigue-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:12px; }
-    .fatigue-name  { width:180px; color:var(--text); flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .fatigue-track { flex:1; background:var(--forest-faint); border-radius:3px; height:10px; overflow:hidden; }
-    .fatigue-fill  { height:100%; border-radius:3px; }
-    .fatigue-label { width:80px; text-align:right; font-size:11px; color:var(--muted); flex-shrink:0; }
+    /* ─── FATIGUE BARS ───────────────────────────────── */
+    .fatigue-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 12px; }
+    .fatigue-name  { width: 190px; color: var(--text); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .fatigue-track { flex: 1; background: var(--cream); border-radius: 3px; height: 8px; overflow: hidden; border: 1px solid var(--border); }
+    .fatigue-fill  { height: 100%; border-radius: 2px; }
+    .fatigue-label { width: 90px; text-align: right; font-size: 11px; color: var(--muted); flex-shrink: 0; }
 
-    /* ─── AUDIENCE ────────────────────────────────── */
-    .gender-bar { display:flex; border-radius:3px; overflow:hidden; height:10px; margin:6px 0 3px; }
-    .seg-cards  { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:4px; }
-    .seg-card   { border:1px solid var(--border); border-radius:var(--rs); padding:14px 16px; }
-    .seg-rank   { font-size:10px; color:var(--hint); text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
-    .seg-title  { font-size:15px; color:var(--forest); margin-bottom:10px; line-height:1.2; }
-    .seg-stat   { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:3px; }
-    .seg-stat span:last-child { color:var(--text); font-weight:500; }
+    /* ─── AUDIENCE ───────────────────────────────────── */
+    .gender-bar { display: flex; border-radius: 3px; overflow: hidden; height: 8px; margin: 6px 0 3px; }
+    .seg-cards  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
+    .seg-card   {
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      padding: 18px 18px 16px;
+      background: var(--white);
+    }
+    .seg-rank   { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hint); margin-bottom: 6px; }
+    .seg-title  { font-size: 16px; font-weight: 700; color: var(--forest); margin-bottom: 12px; line-height: 1.2; letter-spacing: -0.01em; }
+    .seg-stat   { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .seg-stat span:last-child { color: var(--text); font-weight: 700; }
 
-    /* ─── A/B ─────────────────────────────────────── */
+    /* ─── A/B ────────────────────────────────────────── */
     .ab-empty {
-      text-align:center; padding:32px;
-      color:var(--hint); font-size:13px;
-      border:2px dashed var(--border); border-radius:var(--rs);
+      text-align: center;
+      padding: 40px 32px;
+      color: var(--hint);
+      font-size: 13px;
+      border: 2px dashed var(--border);
+      border-radius: var(--rs);
+      background: var(--cream);
     }
-    .ab-empty strong { display:block; font-size:14px; color:var(--muted); margin-bottom:6px; }
+    .ab-empty strong { display: block; font-size: 14px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
 
-    /* ─── CHARTS ──────────────────────────────────── */
-    .chart-wrap { position:relative; width:100%; }
-    .legend-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; font-size:12px; color:var(--muted); }
-    .leg   { display:flex; align-items:center; gap:4px; }
-    .leg-sq{ width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+    /* ─── CHARTS ─────────────────────────────────────── */
+    .chart-wrap { position: relative; width: 100%; }
+    .legend-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .leg   { display: flex; align-items: center; gap: 5px; }
+    .leg-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-    /* ─── HOW-TO ──────────────────────────────────── */
-    .how-to {
-      background:var(--forest-faint);
-      border:1px solid var(--border);
-      border-left:4px solid var(--forest);
-      border-radius:var(--rs);
-      padding:18px 22px;
-      margin-top:36px;
+    /* ─── STAT GRID (email-style 3-col bordered) ─────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--border);
+      gap: 1px;
     }
-    .how-to h3 { font-size:12px; color:var(--forest); margin-bottom:10px; text-transform:uppercase; letter-spacing:.08em; }
-    .how-to ol { padding-left:18px; font-size:13px; color:var(--muted); line-height:2.1; }
-    .how-to code { background:rgba(17,64,54,.1); color:var(--forest); padding:1px 6px; border-radius:4px; font-family:monospace; font-size:12px; }
+    .stat-cell {
+      background: var(--white);
+      padding: 22px 20px;
+      text-align: center;
+    }
+    .stat-cell-num {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--forest);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-cell-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      line-height: 1.4;
+    }
 
-    /* ─── LOADING / ERROR ─────────────────────────── */
-    .error-msg { background:var(--danger-bg); color:var(--danger); border-radius:var(--rs); padding:14px 18px; font-size:13px; margin-bottom:20px; display:none; line-height:1.7; }
-    .loading { display:flex; align-items:center; justify-content:center; min-height:300px; color:var(--muted); font-size:14px; gap:10px; }
-    .spinner { width:20px; height:20px; border:2px solid var(--forest-faint); border-top-color:var(--forest); border-radius:50%; animation:spin .7s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
+    /* ─── CREATIVE NOTE ──────────────────────────────── */
     .creative-note {
-      background:rgba(255,228,36,.12);
-      border:1px solid rgba(255,228,36,.3);
-      border-radius:var(--rs);
-      padding:12px 16px; font-size:12px; color:var(--muted);
-      margin-bottom:16px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 12px 24px;
+      background: rgba(255,228,36,0.10);
+      border-bottom: 1px solid rgba(255,228,36,0.25);
     }
 
-    footer { text-align:center; font-size:12px; color:var(--hint); padding:28px 0 16px; }
+    /* ─── HOW-TO ─────────────────────────────────────── */
+    .how-to {
+      background: var(--forest);
+      border-radius: var(--r);
+      padding: 24px 28px;
+      margin-top: 48px;
+    }
+    .how-to h3 {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: rgba(246,247,237,0.65);
+      margin-bottom: 14px;
+    }
+    .how-to ol { padding-left: 18px; color: rgba(246,247,237,0.78); line-height: 2.2; font-size: 13px; }
+    .how-to strong { color: var(--cream); }
+    .how-to code {
+      background: rgba(246,247,237,0.12);
+      color: var(--yellow);
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
 
-    @media (max-width:720px) {
-      .two, .seg-cards { grid-template-columns:1fr; }
-      header { padding:14px 16px; }
-      main   { padding:20px 14px; }
+    /* ─── REVIEW LIST ────────────────────────────────── */
+    .review-item {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .review-item:last-child { border-bottom: none; }
+    .review-item-name { font-weight: 700; font-size: 13px; color: var(--forest); margin-bottom: 5px; }
+    .review-issue { font-size: 12px; color: var(--danger); margin-bottom: 2px; }
+
+    /* ─── LOADING / ERROR ────────────────────────────── */
+    .error-msg {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border-radius: var(--rs);
+      border: 1px solid rgba(155,44,44,.15);
+      padding: 16px 20px;
+      font-size: 13px;
+      margin-bottom: 24px;
+      display: none;
+      line-height: 1.7;
+    }
+    .loading {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 300px; color: var(--muted); font-size: 14px; gap: 12px;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border); border-top-color: var(--forest);
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── SPACER ─────────────────────────────────────── */
+    .spacer { margin-bottom: 16px; }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    footer {
+      background: var(--forest-deep);
+      margin-top: 64px;
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p { font-size: 11px; color: rgba(246,247,237,0.45); letter-spacing: 0.04em; }
+    footer a { color: rgba(246,247,237,0.45); text-decoration: none; }
+
+    @media (max-width: 760px) {
+      .two, .seg-cards, .stat-grid { grid-template-columns: 1fr; }
+      header, main { padding-left: 20px; padding-right: 20px; }
+      footer { flex-direction: column; padding: 24px 20px; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Golftours<span class="logo-dot">.</span>com</div>
+  <div class="logo">golftours<em>.com</em></div>
   <div class="header-right">
     <div class="live-pill">
       <span class="live-dot"></span>
-      <span id="pill-label">Live</span>
+      <span id="pill-label">GT Traffic 2026</span>
     </div>
     <span id="last-updated">Loading…</span>
   </div>
@@ -275,97 +517,136 @@
       <button class="tog-btn"         id="btn-awareness" onclick="switchCampaign('awareness')">GT Brand Awareness 2026</button>
     </div>
 
-    <!-- 01 KPIs -->
-    <div class="sec"><span class="sec-num">01</span><span class="sec-title" id="sec-kpi-title">Key Results at a Glance</span></div>
+    <!-- ── 01 KPIs ── -->
+    <div class="sec">
+      <p class="sec-overline">01 &nbsp;·&nbsp; <span id="sec-kpi-overline">Performance</span></p>
+      <h2 class="sec-title" id="sec-kpi-title">Key results at a <em>glance</em>.</h2>
+    </div>
     <div class="kpi-grid" id="kpiGrid"></div>
-    <div class="callout"><div class="callout-label">What this means</div><p id="insight-kpi">Loading…</p></div>
+    <div class="callout spacer">
+      <p class="callout-overline">What this means</p>
+      <p id="insight-kpi">Loading…</p>
+    </div>
 
-    <!-- 02 AI Insights -->
-    <div class="sec"><span class="sec-num">02</span><span class="sec-title">AI Insights</span></div>
-    <div class="ai-panel">
-      <div class="ai-panel-header">
-        <div class="ai-panel-title"><div class="ai-dot"></div>Powered by Claude</div>
-        <button class="refresh-btn" onclick="generateAIInsights()">Refresh insights</button>
+    <!-- ── 02 AI Insights ── -->
+    <div class="sec">
+      <p class="sec-overline">02 &nbsp;·&nbsp; Analysis</p>
+      <h2 class="sec-title">AI <em>insights</em>.</h2>
+    </div>
+    <div class="ai-panel spacer">
+      <div class="ai-panel-head">
+        <div class="ai-panel-label"><div class="ai-dot"></div>Powered by Claude</div>
+        <button class="refresh-btn" onclick="generateAIInsights()">Refresh</button>
       </div>
-      <div id="ai-content" class="ai-loading">
-        <div class="ai-spinner"></div>Analysing campaign data…
+      <div class="ai-body">
+        <div id="ai-content" class="ai-loading">
+          <div class="ai-spinner"></div>Analysing campaign data…
+        </div>
       </div>
     </div>
 
-    <!-- 03 Trend -->
-    <div class="sec"><span class="sec-num">03</span><span class="sec-title">Daily Performance Trend</span></div>
-    <div class="card">
-      <div class="legend-row" id="trendLegend"></div>
-      <div class="chart-wrap" style="height:220px"><canvas id="trendChart"></canvas></div>
+    <!-- ── 03 Trend ── -->
+    <div class="sec">
+      <p class="sec-overline">03 &nbsp;·&nbsp; Trends</p>
+      <h2 class="sec-title">Daily performance <em>trend</em>.</h2>
+    </div>
+    <div class="card spacer">
+      <div class="card-head"><span class="card-label">Spend &amp; efficiency over time</span></div>
+      <div class="card-body">
+        <div class="legend-row" id="trendLegend"></div>
+        <div class="chart-wrap" style="height:220px"><canvas id="trendChart"></canvas></div>
+      </div>
     </div>
 
-    <!-- 04 Ad performance -->
-    <div class="sec"><span class="sec-num">04</span><span class="sec-title">Ad Set and Ad Performance</span></div>
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-label">Ad set summary</div>
+    <!-- ── 04 Performance ── -->
+    <div class="sec">
+      <p class="sec-overline">04 &nbsp;·&nbsp; Creative</p>
+      <h2 class="sec-title">Ad set &amp; ad <em>performance</em>.</h2>
+    </div>
+    <div class="card spacer">
+      <div class="card-head"><span class="card-label">Ad set summary</span></div>
       <div id="adsetTableWrap"></div>
     </div>
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-label">Individual ad performance — creative versions grouped</div>
-      <div class="creative-note">Ads sharing the same base name are grouped so you can compare v1 vs v2 side by side. Newest version highlighted.</div>
+    <div class="card spacer">
+      <div class="card-head"><span class="card-label">Individual ad performance — creative versions grouped</span></div>
+      <div class="creative-note">Ads sharing the same base name are grouped so you can compare v1 vs v2 side by side.</div>
       <div id="adTableWrap"></div>
     </div>
-    <div class="callout"><div class="callout-label">What this means</div><p id="insight-adsets">Loading…</p></div>
-
-    <!-- 05 Review -->
-    <div class="sec"><span class="sec-num">05</span><span class="sec-title">Ad Sets to Review</span></div>
-    <div class="two">
-      <div class="card">
-        <div class="card-label">Underperformers vs benchmarks</div>
-        <div style="font-size:11px;color:var(--hint);margin-bottom:12px" id="bench-note"></div>
-        <div id="reviewList"></div>
-      </div>
-      <div class="card">
-        <div class="card-label">Frequency / fatigue indicator</div>
-        <div style="font-size:11px;color:var(--hint);margin-bottom:12px">Bar = frequency. Green &lt;1.5× · Amber 1.5–2× · Red &gt;2×</div>
-        <div id="fatigueList"></div>
-      </div>
+    <div class="callout spacer">
+      <p class="callout-overline">What this means</p>
+      <p id="insight-adsets">Loading…</p>
     </div>
 
-    <!-- 06 Audience -->
-    <div class="sec"><span class="sec-num">06</span><span class="sec-title">Target Audience</span></div>
-    <div class="two" style="margin-bottom:16px">
+    <!-- ── 05 Review ── -->
+    <div class="sec">
+      <p class="sec-overline">05 &nbsp;·&nbsp; Action required</p>
+      <h2 class="sec-title">Ad sets to <em>review</em>.</h2>
+    </div>
+    <div class="two spacer">
       <div class="card">
-        <div class="card-label">Spend and CTR by age group</div>
-        <table><thead><tr><th>Age</th><th>Spend</th><th>Clicks</th><th>CTR</th><th>Gender</th></tr></thead>
-          <tbody id="ageRows"></tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-label">Spend by age and gender</div>
-        <div class="legend-row">
-          <span class="leg"><span class="leg-sq" style="background:var(--forest)"></span>Male</span>
-          <span class="leg"><span class="leg-sq" style="background:var(--yellow)"></span>Female</span>
+        <div class="card-head"><span class="card-label">Underperformers vs benchmarks</span></div>
+        <div class="card-body">
+          <p style="font-size:11px;color:var(--hint);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px" id="bench-note"></p>
+          <div id="reviewList"></div>
         </div>
-        <div class="chart-wrap" style="height:220px"><canvas id="audChart"></canvas></div>
       </div>
-    </div>
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-label">Gender breakdown</div>
-      <div id="genderSection"></div>
-    </div>
-    <div class="seg-cards" id="segCards"></div>
-    <div class="callout" style="margin-top:16px"><div class="callout-label">What this means</div><p id="insight-audience">Loading…</p></div>
-
-    <!-- 07 A/B -->
-    <div class="sec"><span class="sec-num">07</span><span class="sec-title">A/B Tests</span></div>
-    <div class="card" id="abSection">
-      <div class="ab-empty">
-        <strong>No active A/B tests detected</strong>
-        Name variants with suffix "Ad Name - A" / "Ad Name - B" and they appear here automatically.
+      <div class="card">
+        <div class="card-head"><span class="card-label">Frequency / fatigue indicator</span></div>
+        <div class="card-body">
+          <p style="font-size:11px;color:var(--hint);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px">Green &lt;1.5× · Amber 1.5–2× · Red &gt;2×</p>
+          <div id="fatigueList"></div>
+        </div>
       </div>
     </div>
 
+    <!-- ── 06 Audience ── -->
+    <div class="sec">
+      <p class="sec-overline">06 &nbsp;·&nbsp; Audience</p>
+      <h2 class="sec-title">Who we're <em>reaching</em>.</h2>
+    </div>
+    <div class="two spacer">
+      <div class="card">
+        <div class="card-head"><span class="card-label">Spend and CTR by age group</span></div>
+        <table>
+          <thead><tr><th>Age</th><th>Spend</th><th>Clicks</th><th>CTR</th><th>Gender</th></tr></thead>
+          <tbody id="ageRows"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-label">Spend by age and gender</span></div>
+        <div class="card-body">
+          <div class="legend-row">
+            <span class="leg"><span class="leg-sq" style="background:var(--forest)"></span>Male</span>
+            <span class="leg"><span class="leg-sq" style="background:var(--yellow)"></span>Female</span>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="audChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+    <div class="card spacer">
+      <div class="card-head"><span class="card-label">Gender breakdown</span></div>
+      <div class="card-body" id="genderSection"></div>
+    </div>
+    <div class="seg-cards spacer" id="segCards"></div>
+    <div class="callout spacer">
+      <p class="callout-overline">What this means</p>
+      <p id="insight-audience">Loading…</p>
+    </div>
+
+    <!-- ── 07 A/B ── -->
+    <div class="sec">
+      <p class="sec-overline">07 &nbsp;·&nbsp; Testing</p>
+      <h2 class="sec-title">A/B <em>tests</em>.</h2>
+    </div>
+    <div id="abSection" class="spacer"></div>
+
+    <!-- How-to -->
     <div class="how-to">
-      <h3>Switching campaigns</h3>
+      <h3>Using this dashboard</h3>
       <ol>
         <li>Use the toggle buttons above to switch between <strong>GT Traffic 2026</strong> and <strong>GT Brand Awareness 2026</strong>.</li>
-        <li>Brand Awareness shows Reach, Frequency and CPM instead of CTR / CPC — click the tab to see those metrics.</li>
-        <li>Name updated creatives with <code>v2</code>, <code>v3</code> etc. and they will automatically be grouped with the original.</li>
+        <li>Brand Awareness shows Reach, Frequency and CPM instead of CTR / CPC.</li>
+        <li>Name updated creatives with <code>v2</code>, <code>v3</code> etc. and they group automatically.</li>
         <li>Name A/B variants with suffix <code>Ad Name - A</code> / <code>Ad Name - B</code> to surface them in section 07.</li>
       </ol>
     </div>
@@ -377,7 +658,10 @@
   </div>
 </main>
 
-<footer>Data via Windsor.ai · Meta Ads 532007480578438 · Refreshes on page load</footer>
+<footer>
+  <p>Data via Windsor.ai · Meta Ads 532007480578438 · Refreshes on page load</p>
+  <p>© 2026 golftours.com · A GTC company</p>
+</footer>
 
 <script>
 /* ════════════════════════════════════════════════════
@@ -404,7 +688,6 @@ const fmtK = n => n>=1000?(n/1000).toFixed(1)+"K":String(Math.round(n));
 const fmtM = n => n>=1e6?(n/1e6).toFixed(2)+"M":fmtK(n);
 const GBP  = (n,d=2) => "£"+fmt(n,d);
 const pct  = n => (n*100).toFixed(2)+"%";
-/* Safe outbound clicks getter — Windsor field name can vary */
 const ob   = r => +(r.outbound_clicks_outbound_click ?? r["outbound_clicks_outbound_click"] ?? 0);
 const charts = {};
 
@@ -432,7 +715,6 @@ function daysSince(s){
   if(!s) return 0;
   return Math.max(1,Math.round((Date.now()-new Date(s))/864e5));
 }
-/* Strip version/test prefix and suffix for grouping */
 function baseName(name){
   return name
     .replace(/^Test\s*[-–]\s*/i,"")
@@ -455,11 +737,10 @@ function switchCampaign(name){
   document.querySelectorAll(".tog-btn").forEach(b=>b.classList.remove("active","active-brand"));
   const btn=document.getElementById("btn-"+name);
   btn.classList.add(name==="awareness"?"active-brand":"active");
-  document.getElementById("pill-label").textContent="Live · "+(name==="awareness"?"GT Brand Awareness 2026":"GT Traffic 2026");
+  document.getElementById("pill-label").textContent=name==="awareness"?"GT Brand Awareness 2026":"GT Traffic 2026";
   document.getElementById("error-msg").style.display="none";
   document.getElementById("dashboard").style.display="none";
   document.getElementById("loading").style.display="flex";
-  // Clear stale table content so previous campaign data doesn't flash on switch
   document.getElementById("adsetTableWrap").innerHTML="";
   document.getElementById("adTableWrap").innerHTML="";
   document.getElementById("kpiGrid").innerHTML="";
@@ -471,11 +752,8 @@ function switchCampaign(name){
 
 /* ════════════════════════════════════════════════════
    WINDSOR PROXY FETCH
-   All requests go through /api/data which injects the API key
    ════════════════════════════════════════════════════ */
 async function fetchWindsor(fields){
-  // Snapshot the active campaign at the moment of the call
-  // so tab-switching mid-load can't mix data between campaigns
   const campaign = activeCampaign;
   const p=new URLSearchParams();
   p.set("fields",fields.join(","));
@@ -494,7 +772,7 @@ async function fetchWindsor(fields){
 }
 
 /* ════════════════════════════════════════════════════
-   AI INSIGHTS  — proxied through /api/ai
+   AI INSIGHTS
    ════════════════════════════════════════════════════ */
 async function generateAIInsights(){
   const el=document.getElementById("ai-content");
@@ -558,7 +836,7 @@ Write 4-5 concise sentences covering: overall efficiency vs travel benchmarks (C
    BUILD ADSET TABLE
    ════════════════════════════════════════════════════ */
 function buildAdsetTable(adsets,isAwareness){
-  if(!adsets.length) return "<p style='color:var(--hint);font-size:13px'>No ad set data available yet.</p>";
+  if(!adsets.length) return "<p style='color:var(--hint);font-size:13px;padding:20px 24px'>No ad set data available yet.</p>";
   if(isAwareness){
     let h=`<table><thead><tr>
       <th>Ad set</th><th>Status</th><th>Spend</th>
@@ -568,16 +846,16 @@ function buildAdsetTable(adsets,isAwareness){
       const imp=+(a.impressions||0),rch=+(a.reach||0);
       const freq=rch?imp/rch:0, cpm=imp?+a.spend/imp*1000:0;
       const sb=a.adset_effective_status==="ACTIVE"
-        ?'<span class="badge b-win">Active</span>'
+        ?'<span class="badge b-active">Active</span>'
         :`<span class="badge b-paused">${a.adset_effective_status||"—"}</span>`;
       h+=`<tr>
-        <td style="font-weight:500">${a.adset_name}</td><td>${sb}</td>
+        <td style="font-weight:700">${a.adset_name}</td><td>${sb}</td>
         <td>${GBP(+a.spend,2)}</td>
-        <td style="font-weight:500">${fmtM(rch)}</td>
+        <td style="font-weight:700">${fmtM(rch)}</td>
         <td>${fmtM(imp)}</td>
-        <td style="${freq>=BENCH_B.freq?"color:var(--danger)":""}">${freq.toFixed(2)}x</td>
+        <td style="${freq>=BENCH_B.freq?"color:var(--danger);font-weight:700":""}">${freq.toFixed(2)}×</td>
         <td>${GBP(cpm,2)}</td>
-        <td>${a.days}d</td>
+        <td style="color:var(--hint)">${a.days}d</td>
         <td>${signalBrand(cpm)}</td>
       </tr>`;
     });
@@ -589,16 +867,16 @@ function buildAdsetTable(adsets,isAwareness){
     </tr></thead><tbody>`;
     adsets.forEach(a=>{
       const sb=a.adset_effective_status==="ACTIVE"
-        ?'<span class="badge b-win">Active</span>'
+        ?'<span class="badge b-active">Active</span>'
         :`<span class="badge b-paused">${a.adset_effective_status||"—"}</span>`;
       h+=`<tr>
-        <td style="font-weight:500">${a.adset_name}</td><td>${sb}</td>
+        <td style="font-weight:700">${a.adset_name}</td><td>${sb}</td>
         <td>${GBP(+a.spend,2)}</td>
-        <td style="${a.ctr>=BENCH_T.ctr?"color:var(--good);font-weight:500":a.ctr<BENCH_T.ctr*.5?"color:var(--danger)":""}">${pct(a.ctr)}</td>
+        <td style="${a.ctr>=BENCH_T.ctr?"color:var(--good);font-weight:700":a.ctr<BENCH_T.ctr*.5?"color:var(--danger)":""}">${pct(a.ctr)}</td>
         <td>${GBP(a.cpc,3)}</td>
-        <td style="font-weight:500">${ob(a).toLocaleString()}</td>
-        <td>${a.days}d</td>
-        <td style="${+a.frequency>=BENCH_T.freq?"color:var(--danger)":""}">${Number(a.frequency||0).toFixed(2)}x</td>
+        <td style="font-weight:700">${ob(a).toLocaleString()}</td>
+        <td style="color:var(--hint)">${a.days}d</td>
+        <td style="${+a.frequency>=BENCH_T.freq?"color:var(--danger);font-weight:700":""}">${Number(a.frequency||0).toFixed(2)}×</td>
         <td>${signal(a.ctr,a.cpc)}</td>
       </tr>`;
     });
@@ -607,12 +885,11 @@ function buildAdsetTable(adsets,isAwareness){
 }
 
 /* ════════════════════════════════════════════════════
-   BUILD ADS TABLE  (with version grouping)
+   BUILD ADS TABLE
    ════════════════════════════════════════════════════ */
 function buildAdTable(ads,isAwareness){
-  if(!ads.length) return "<p style='color:var(--hint);font-size:13px'>No ad data available yet.</p>";
+  if(!ads.length) return "<p style='color:var(--hint);font-size:13px;padding:20px 24px'>No ad data available yet.</p>";
 
-  /* group by base name */
   const grouped={};
   ads.forEach(a=>{
     const base=baseName(a.ad_name);
@@ -638,11 +915,11 @@ function buildAdTable(ads,isAwareness){
         const a=versions[0],imp=+(a.impressions||0),rch=+(a.reach||0);
         const fr=rch?imp/rch:0,cp=imp?+a.spend/imp*1000:0;
         html+=`<tr>
-          <td style="font-weight:500">${a.ad_name}</td>
+          <td style="font-weight:700">${a.ad_name}</td>
           <td style="color:var(--muted);font-size:12px">${a.adset_name}</td>
           <td>${GBP(+a.spend,2)}</td>
           <td>${fmtM(rch)}</td><td>${fmtM(imp)}</td>
-          <td>${fr.toFixed(2)}x</td><td>${GBP(cp,2)}</td>
+          <td>${fr.toFixed(2)}×</td><td>${GBP(cp,2)}</td>
           <td>${signalBrand(cp)}</td>
         </tr>`;
       }else{
@@ -650,8 +927,8 @@ function buildAdTable(ads,isAwareness){
         const tR=versions.reduce((s,a)=>s+(+a.reach||0),0);
         const tI=versions.reduce((s,a)=>s+(+a.impressions||0),0);
         html+=`<tr class="v-group-header">
-          <td colspan="2">${base} <span style="font-size:10px;color:var(--hint);font-weight:400">(${versions.length} versions)</span></td>
-          <td>${GBP(tS,2)}</td><td style="font-weight:600">${fmtM(tR)}</td><td>${fmtM(tI)}</td>
+          <td colspan="2">${base} <span style="font-size:10px;color:var(--hint);font-weight:400;letter-spacing:0.06em;text-transform:uppercase">(${versions.length} versions)</span></td>
+          <td>${GBP(tS,2)}</td><td style="font-weight:700">${fmtM(tR)}</td><td>${fmtM(tI)}</td>
           <td colspan="3"></td>
         </tr>`;
         versions.forEach(a=>{
@@ -659,11 +936,11 @@ function buildAdTable(ads,isAwareness){
           const imp=+(a.impressions||0),rch=+(a.reach||0);
           const fr=rch?imp/rch:0,cp=imp?+a.spend/imp*1000:0;
           html+=`<tr class="v-row">
-            <td>${a.ad_name}${newest?'<span class="badge b-new" style="margin-left:6px">Latest</span>':''}</td>
+            <td>${a.ad_name}${newest?'<span class="badge b-new" style="margin-left:8px">Latest</span>':''}</td>
             <td style="color:var(--muted);font-size:12px">${a.adset_name}</td>
             <td>${GBP(+a.spend,2)}</td>
             <td>${fmtM(rch)}</td><td>${fmtM(imp)}</td>
-            <td>${fr.toFixed(2)}x</td><td>${GBP(cp,2)}</td>
+            <td>${fr.toFixed(2)}×</td><td>${GBP(cp,2)}</td>
             <td>${signalBrand(cp)}</td>
           </tr>`;
         });
@@ -679,31 +956,31 @@ function buildAdTable(ads,isAwareness){
       if(versions.length===1){
         const a=versions[0];
         html+=`<tr>
-          <td style="font-weight:500">${a.ad_name}</td>
+          <td style="font-weight:700">${a.ad_name}</td>
           <td style="color:var(--muted);font-size:12px">${a.adset_name}</td>
           <td>${GBP(+a.spend,2)}</td>
-          <td style="${a.ctr>=BENCH_T.ctr?"color:var(--good);font-weight:500":a.ctr<BENCH_T.ctr*.5?"color:var(--danger)":""}">${pct(a.ctr)}</td>
+          <td style="${a.ctr>=BENCH_T.ctr?"color:var(--good);font-weight:700":a.ctr<BENCH_T.ctr*.5?"color:var(--danger)":""}">${pct(a.ctr)}</td>
           <td>${GBP(a.cpc,3)}</td>
-          <td style="font-weight:500">${ob(a).toLocaleString()}</td>
+          <td style="font-weight:700">${ob(a).toLocaleString()}</td>
           <td>${signal(a.ctr,a.cpc)}</td>
         </tr>`;
       }else{
         const tS=versions.reduce((s,a)=>s+(+a.spend||0),0);
         const tO=versions.reduce((s,a)=>s+ob(a),0);
         html+=`<tr class="v-group-header">
-          <td colspan="2">${base} <span style="font-size:10px;color:var(--hint);font-weight:400">(${versions.length} versions)</span></td>
+          <td colspan="2">${base} <span style="font-size:10px;color:var(--hint);font-weight:400;letter-spacing:0.06em;text-transform:uppercase">(${versions.length} versions)</span></td>
           <td>${GBP(tS,2)}</td><td></td><td></td>
-          <td style="font-weight:600">${tO.toLocaleString()}</td><td></td>
+          <td style="font-weight:700">${tO.toLocaleString()}</td><td></td>
         </tr>`;
         versions.forEach(a=>{
           const newest=isNewer(a.ad_name)||(a===versions[versions.length-1]&&versions.length>1);
           html+=`<tr class="v-row">
-            <td>${a.ad_name}${newest?'<span class="badge b-new" style="margin-left:6px">Latest</span>':''}</td>
+            <td>${a.ad_name}${newest?'<span class="badge b-new" style="margin-left:8px">Latest</span>':''}</td>
             <td style="color:var(--muted);font-size:12px">${a.adset_name}</td>
             <td>${GBP(+a.spend,2)}</td>
-            <td style="${a.ctr>=BENCH_T.ctr?"color:var(--good);font-weight:500":a.ctr<BENCH_T.ctr*.5?"color:var(--danger)":""}">${pct(a.ctr)}</td>
+            <td style="${a.ctr>=BENCH_T.ctr?"color:var(--good);font-weight:700":a.ctr<BENCH_T.ctr*.5?"color:var(--danger)":""}">${pct(a.ctr)}</td>
             <td>${GBP(a.cpc,3)}</td>
-            <td style="font-weight:500">${ob(a).toLocaleString()}</td>
+            <td style="font-weight:700">${ob(a).toLocaleString()}</td>
             <td>${signal(a.ctr,a.cpc)}</td>
           </tr>`;
         });
@@ -764,18 +1041,18 @@ async function render(){
       }))
       .sort((a,b)=>(+b.spend||0)-(+a.spend||0));
 
-    /* Store for AI */
     currentData={agg,adsets,ads,days};
 
     /* ════ KPIs ════ */
     const kpiGrid=document.getElementById("kpiGrid");
     if(isAwareness){
-      document.getElementById("sec-kpi-title").textContent="Brand Awareness Key Results";
-      document.getElementById("bench-note").textContent="Brand benchmarks: CPM under £5.00 · Frequency 1.5–3× ideal · Reach growth is primary goal";
+      document.getElementById("sec-kpi-overline").textContent="Brand Awareness";
+      document.getElementById("sec-kpi-title").innerHTML='Key results at a <em>glance</em>.';
+      document.getElementById("bench-note").textContent="CPM under £5.00 · Frequency 1.5–3× ideal · Reach growth is primary goal";
       kpiGrid.innerHTML=`
         <div class="kpi"><div class="kpi-label">Total Spend</div><div class="kpi-value">${GBP(agg.spend,2)}</div><div class="kpi-sub">${days} day${days!==1?"s":""} active</div></div>
-        <div class="kpi kpi-accent"><div class="kpi-label">Total Reach</div><div class="kpi-value">${fmtM(agg.reach)}</div><div class="kpi-sub">Unique people</div></div>
-        <div class="kpi kpi-accent"><div class="kpi-label">Impressions</div><div class="kpi-value">${fmtM(agg.imp)}</div><div class="kpi-sub">Total views</div></div>
+        <div class="kpi kpi-dark"><div class="kpi-label">Total Reach</div><div class="kpi-value">${fmtM(agg.reach)}</div><div class="kpi-sub">Unique people</div></div>
+        <div class="kpi kpi-dark"><div class="kpi-label">Impressions</div><div class="kpi-value">${fmtM(agg.imp)}</div><div class="kpi-sub">Total views</div></div>
         <div class="kpi"><div class="kpi-label">Avg. CPM</div><div class="kpi-value">${GBP(agg.cpm,2)}</div><div class="kpi-sub">Cost per 1k impressions</div></div>
         <div class="kpi"><div class="kpi-label">Frequency</div><div class="kpi-value">${agg.freq.toFixed(2)}×</div><div class="kpi-sub">Impressions per person</div></div>
         <div class="kpi"><div class="kpi-label">Cost per Person</div><div class="kpi-value">${GBP(agg.reach?agg.spend/agg.reach:0,4)}</div><div class="kpi-sub">Efficiency metric</div></div>`;
@@ -785,7 +1062,8 @@ async function render(){
         `Each person sees the ad an average of <strong>${agg.freq.toFixed(2)}×</strong> — ${freqNote}. `+
         `CPM of <strong>${GBP(agg.cpm,2)}</strong> is ${agg.cpm<5?"efficient for awareness spend":"above average — consider testing different placements or audiences"}.`;
     }else{
-      document.getElementById("sec-kpi-title").textContent="Key Results at a Glance";
+      document.getElementById("sec-kpi-overline").textContent="Performance";
+      document.getElementById("sec-kpi-title").innerHTML='Key results at a <em>glance</em>.';
       document.getElementById("bench-note").textContent="Travel benchmarks: CTR ~2.5% · CPC £0.40–0.80 · Frequency warning over 1.8×";
       kpiGrid.innerHTML=`
         <div class="kpi"><div class="kpi-label">Total Spend</div><div class="kpi-value">${GBP(agg.spend,2)}</div><div class="kpi-sub">${days} day${days!==1?"s":""} active</div></div>
@@ -794,10 +1072,10 @@ async function render(){
         <div class="kpi"><div class="kpi-label">Click-Through Rate</div><div class="kpi-value">${pct(agg.ctr)}</div></div>
         <div class="kpi"><div class="kpi-label">Avg. CPM</div><div class="kpi-value">${GBP(agg.cpm,2)}</div></div>
         <div class="kpi"><div class="kpi-label">Unique Reach</div><div class="kpi-value">${fmtM(agg.reach)}</div></div>
-        <div class="kpi kpi-accent"><div class="kpi-label">Cost Per Click</div><div class="kpi-value">${GBP(agg.cpc,3)}</div><div class="kpi-sub">Avg across all ads</div></div>
+        <div class="kpi kpi-dark"><div class="kpi-label">Cost Per Click</div><div class="kpi-value">${GBP(agg.cpc,3)}</div><div class="kpi-sub">Avg across all ads</div></div>
         <div class="kpi"><div class="kpi-label">Frequency</div><div class="kpi-value">${agg.freq.toFixed(2)}×</div><div class="kpi-sub">Impressions per person</div></div>
-        <div class="kpi kpi-accent"><div class="kpi-label">Outbound Clicks</div><div class="kpi-value">${fmtK(agg.ob)}</div><div class="kpi-sub">Off-Facebook traffic</div></div>
-        <div class="kpi kpi-accent"><div class="kpi-label">Cost / Outbound</div><div class="kpi-value">${GBP(agg.cobc,3)}</div><div class="kpi-sub">True traffic cost</div></div>`;
+        <div class="kpi kpi-dark"><div class="kpi-label">Outbound Clicks</div><div class="kpi-value">${fmtK(agg.ob)}</div><div class="kpi-sub">Off-Facebook traffic</div></div>
+        <div class="kpi kpi-dark"><div class="kpi-label">Cost / Outbound</div><div class="kpi-value">${GBP(agg.cobc,3)}</div><div class="kpi-sub">True traffic cost</div></div>`;
       document.getElementById("insight-kpi").innerHTML=
         `Campaign has spent <strong>${GBP(agg.spend,2)}</strong> reaching <strong>${fmtM(agg.reach)}</strong> unique people over <strong>${days} day${days!==1?"s":""}</strong>. `+
         `CTR is <strong>${pct(agg.ctr)}</strong> — <strong>${agg.ctr>=BENCH_T.ctr?"above":"below"}</strong> the travel industry benchmark of ~2.5%. `+
@@ -823,12 +1101,12 @@ async function render(){
         <span class="leg"><span class="leg-sq" style="background:var(--forest)"></span>Spend</span>
         <span class="leg"><span class="leg-sq" style="background:var(--yellow);border-radius:0"></span>CPM</span>`;
       makeChart("trendChart",{data:{labels:lblDate,datasets:[
-        {type:"bar", label:"Spend",data:sd.map(d=>+dm[d].spend.toFixed(2)),backgroundColor:"rgba(27,55,47,.55)",borderColor:"#1B372F",borderWidth:1,yAxisID:"y"},
-        {type:"line",label:"CPM",  data:sd.map(d=>+(dm[d].cpmSum/dm[d].n).toFixed(2)),borderColor:"#FFE424",backgroundColor:"transparent",pointRadius:3,borderWidth:2,yAxisID:"y2",tension:.3}
+        {type:"bar", label:"Spend",data:sd.map(d=>+dm[d].spend.toFixed(2)),backgroundColor:"rgba(27,55,47,.6)",borderColor:"#1B372F",borderWidth:1,yAxisID:"y",borderRadius:3},
+        {type:"line",label:"CPM",  data:sd.map(d=>+(dm[d].cpmSum/dm[d].n).toFixed(2)),borderColor:"#FFE424",backgroundColor:"transparent",pointRadius:3,pointBackgroundColor:"#FFE424",borderWidth:2,yAxisID:"y2",tension:.35}
       ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
-        x:{ticks:{font:{size:11},color:"#7A9D95"},grid:{display:false}},
-        y:{position:"left",ticks:{font:{size:11},color:"#4A6B63",callback:v=>"£"+v},grid:{color:"rgba(27,55,47,.07)"}},
-        y2:{position:"right",ticks:{font:{size:11},color:"#7A9D95",callback:v=>"£"+v},grid:{display:false}}
+        x:{ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#8A9691"},grid:{display:false}},
+        y:{position:"left",ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#5B6E68",callback:v=>"£"+v},grid:{color:"rgba(217,221,206,.6)"}},
+        y2:{position:"right",ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#8A9691",callback:v=>"£"+v},grid:{display:false}}
       }}});
     }else{
       document.getElementById("trendLegend").innerHTML=`
@@ -836,13 +1114,13 @@ async function render(){
         <span class="leg"><span class="leg-sq" style="background:var(--yellow);border-radius:0"></span>CTR %</span>
         <span class="leg"><span class="leg-sq" style="background:rgba(27,55,47,.3);border:1px dashed #1B372F;border-radius:0"></span>CPM</span>`;
       makeChart("trendChart",{data:{labels:lblDate,datasets:[
-        {type:"bar", label:"Spend",data:sd.map(d=>+dm[d].spend.toFixed(2)),backgroundColor:"rgba(27,55,47,.55)",borderColor:"#1B372F",borderWidth:1,yAxisID:"y"},
-        {type:"line",label:"CTR %",data:sd.map(d=>+(dm[d].ctrSum/dm[d].n).toFixed(2)),borderColor:"#FFE424",backgroundColor:"transparent",pointRadius:3,borderWidth:2,yAxisID:"y2",tension:.3},
-        {type:"line",label:"CPM",  data:sd.map(d=>+(dm[d].cpmSum/dm[d].n).toFixed(2)),borderColor:"rgba(27,55,47,.4)",backgroundColor:"transparent",pointRadius:2,borderWidth:1.5,yAxisID:"y",tension:.3,borderDash:[4,3]}
+        {type:"bar", label:"Spend",data:sd.map(d=>+dm[d].spend.toFixed(2)),backgroundColor:"rgba(27,55,47,.6)",borderColor:"#1B372F",borderWidth:1,yAxisID:"y",borderRadius:3},
+        {type:"line",label:"CTR %",data:sd.map(d=>+(dm[d].ctrSum/dm[d].n).toFixed(2)),borderColor:"#FFE424",backgroundColor:"transparent",pointRadius:3,pointBackgroundColor:"#FFE424",borderWidth:2,yAxisID:"y2",tension:.35},
+        {type:"line",label:"CPM",  data:sd.map(d=>+(dm[d].cpmSum/dm[d].n).toFixed(2)),borderColor:"rgba(27,55,47,.4)",backgroundColor:"transparent",pointRadius:2,borderWidth:1.5,yAxisID:"y",tension:.35,borderDash:[4,3]}
       ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
-        x:{ticks:{font:{size:11},color:"#7A9D95"},grid:{display:false}},
-        y:{position:"left",ticks:{font:{size:11},color:"#4A6B63",callback:v=>"£"+v},grid:{color:"rgba(27,55,47,.07)"}},
-        y2:{position:"right",ticks:{font:{size:11},color:"#7A9D95",callback:v=>v+"%"},grid:{display:false}}
+        x:{ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#8A9691"},grid:{display:false}},
+        y:{position:"left",ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#5B6E68",callback:v=>"£"+v},grid:{color:"rgba(217,221,206,.6)"}},
+        y2:{position:"right",ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#8A9691",callback:v=>v+"%"},grid:{display:false}}
       }}});
     }
 
@@ -871,7 +1149,7 @@ async function render(){
       toReview=adsets.filter(a=>a.ctr<BENCH_T.ctr*.8||a.cpc>BENCH_T.cpc*1.2||+a.frequency>=BENCH_T.freq);
     }
     if(!toReview.length){
-      reviewEl.innerHTML='<p style="font-size:13px;color:var(--good)">All ad sets within acceptable ranges.</p>';
+      reviewEl.innerHTML='<p style="font-size:13px;color:var(--good);font-weight:700">All ad sets within acceptable ranges.</p>';
     }else{
       toReview.forEach(a=>{
         const issues=[];
@@ -885,9 +1163,9 @@ async function render(){
           if(a.cpc>BENCH_T.cpc*1.2)       issues.push(`CPC ${GBP(a.cpc,3)} is above benchmark`);
           if(+a.frequency>=BENCH_T.freq)  issues.push(`Frequency ${Number(a.frequency||0).toFixed(2)}× — audience fatigue risk`);
         }
-        reviewEl.innerHTML+=`<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-          <div style="font-weight:500;font-size:13px;margin-bottom:4px">${a.adset_name}</div>
-          ${issues.map(i=>`<div style="font-size:12px;color:var(--danger);margin-bottom:2px">- ${i}</div>`).join("")}
+        reviewEl.innerHTML+=`<div class="review-item">
+          <div class="review-item-name">${a.adset_name}</div>
+          ${issues.map(i=>`<div class="review-issue">— ${i}</div>`).join("")}
         </div>`;
       });
     }
@@ -897,7 +1175,7 @@ async function render(){
     fatEl.innerHTML="";
     adsets.forEach(a=>{
       const f=+a.frequency||1,pct_=Math.min(100,(f/3)*100);
-      const col=f>=2?"#E07070":f>=1.5?"#E8C84A":"#5DBA7A";
+      const col=f>=2?"#C0392B":f>=1.5?"#D4AC0D":"#27AE60";
       fatEl.innerHTML+=`<div class="fatigue-row">
         <div class="fatigue-name">${a.adset_name}</div>
         <div class="fatigue-track"><div class="fatigue-fill" style="width:${pct_}%;background:${col}"></div></div>
@@ -929,24 +1207,24 @@ async function render(){
       if(t.spend>topSpend){topSpend=t.spend;topSpendAge=age;}
       const totG=t.mSpend+t.fSpend||1,mPct=Math.round(t.mSpend/totG*100);
       ageRows.innerHTML+=`<tr>
-        <td>${age}</td><td>${GBP(t.spend,0)}</td><td>${t.clicks.toLocaleString()}</td>
-        <td style="${ageCtr>=BENCH_T.ctr?"color:var(--good);font-weight:500":""}">${pct(ageCtr)}</td>
+        <td style="font-weight:700">${age}</td><td>${GBP(t.spend,0)}</td><td>${t.clicks.toLocaleString()}</td>
+        <td style="${ageCtr>=BENCH_T.ctr?"color:var(--good);font-weight:700":""}">${pct(ageCtr)}</td>
         <td><div style="display:flex;align-items:center;gap:6px">
-          <div class="gender-bar" style="width:80px">
+          <div class="gender-bar" style="width:72px">
             <div style="width:${mPct}%;background:var(--forest);height:100%"></div>
             <div style="width:${100-mPct}%;background:var(--yellow);height:100%"></div>
           </div>
-          <span style="font-size:11px;color:var(--muted)">${mPct}% M</span>
+          <span style="font-size:11px;color:var(--muted)">${mPct}%M</span>
         </div></td>
       </tr>`;
     });
 
     makeChart("audChart",{type:"bar",data:{labels:ages,datasets:[
-      {label:"Male",  data:mS.map(v=>+v.toFixed(2)),backgroundColor:"#1B372F",stack:"s"},
+      {label:"Male",  data:mS.map(v=>+v.toFixed(2)),backgroundColor:"#1B372F",stack:"s",borderRadius:3},
       {label:"Female",data:fS.map(v=>+v.toFixed(2)),backgroundColor:"#FFE424",stack:"s"}
     ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
-      x:{ticks:{font:{size:11},color:"#7A9D95"},grid:{display:false}},
-      y:{ticks:{font:{size:11},color:"#4A6B63",callback:v=>"£"+v},grid:{color:"rgba(27,55,47,.07)"}}
+      x:{ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#8A9691"},grid:{display:false}},
+      y:{ticks:{font:{size:11,family:"'DM Sans', sans-serif"},color:"#5B6E68",callback:v=>"£"+v},grid:{color:"rgba(217,221,206,.6)"}}
     }}});
 
     const totM=mS.reduce((a,b)=>a+b,0),totF=fS.reduce((a,b)=>a+b,0),totG=totM+totF||1;
@@ -958,33 +1236,33 @@ async function render(){
     const mCtr=mImp?mClicks/mImp:0,fCtr=fImp?fClicks/fImp:0;
 
     document.getElementById("genderSection").innerHTML=
-      `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      `<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
         <div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Spend split</div>
-          <div class="gender-bar" style="height:14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--hint);margin-bottom:8px">Spend split</div>
+          <div class="gender-bar" style="height:12px;border-radius:3px">
             <div style="width:${mPct}%;background:var(--forest)"></div>
             <div style="width:${100-mPct}%;background:var(--yellow)"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px">
-            <span style="color:var(--forest);font-weight:500">Male ${mPct}% · ${GBP(totM,0)}</span>
-            <span style="color:var(--muted);font-weight:500">Female ${100-mPct}% · ${GBP(totF,0)}</span>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px">
+            <span style="color:var(--forest);font-weight:700">Male ${mPct}% · ${GBP(totM,0)}</span>
+            <span style="color:var(--muted);font-weight:700">Female ${100-mPct}% · ${GBP(totF,0)}</span>
           </div>
         </div>
         <div><table style="font-size:13px">
           <thead><tr><th>Gender</th><th>Spend</th><th>Clicks</th><th>CTR</th></tr></thead>
           <tbody>
-            <tr><td>Male</td><td>${GBP(totM,0)}</td><td>${mClicks.toLocaleString()}</td><td style="color:var(--good);font-weight:500">${pct(mCtr)}</td></tr>
-            <tr><td>Female</td><td>${GBP(totF,0)}</td><td>${fClicks.toLocaleString()}</td><td>${pct(fCtr)}</td></tr>
+            <tr><td style="font-weight:700">Male</td><td>${GBP(totM,0)}</td><td>${mClicks.toLocaleString()}</td><td style="color:var(--good);font-weight:700">${pct(mCtr)}</td></tr>
+            <tr><td style="font-weight:700">Female</td><td>${GBP(totF,0)}</td><td>${fClicks.toLocaleString()}</td><td>${pct(fCtr)}</td></tr>
           </tbody>
         </table></div>
       </div>`;
 
     document.getElementById("segCards").innerHTML=[
-      {rank:"#1 Segment",title:bestAge+" Year Olds",   note:"Best CTR",       ctr:pct(bestCtr),  spend:GBP(ageTotals[bestAge]?.spend||0,0),   clicks:(ageTotals[bestAge]?.clicks||0).toLocaleString()},
-      {rank:"#2 Segment",title:"Male Audience",         note:"Dominant spend", ctr:pct(mCtr),     spend:GBP(totM,0),                            clicks:mClicks.toLocaleString()},
-      {rank:"#3 Segment",title:topSpendAge+" (Top Spend)",note:"Highest spend",ctr:pct(ageTotals[topSpendAge]?ageTotals[topSpendAge].clicks/(ageTotals[topSpendAge].imp||1):0),spend:GBP(topSpend,0),clicks:(ageTotals[topSpendAge]?.clicks||0).toLocaleString()}
+      {rank:"01 · Best CTR",title:bestAge+" year olds",   note:"Best click-through rate",       ctr:pct(bestCtr),  spend:GBP(ageTotals[bestAge]?.spend||0,0),   clicks:(ageTotals[bestAge]?.clicks||0).toLocaleString()},
+      {rank:"02 · Dominant spend",title:"Male audience",         note:"Highest budget allocation", ctr:pct(mCtr),     spend:GBP(totM,0),                            clicks:mClicks.toLocaleString()},
+      {rank:"03 · Top spend",title:topSpendAge+" (highest spend)",note:"Most budget spent here",ctr:pct(ageTotals[topSpendAge]?ageTotals[topSpendAge].clicks/(ageTotals[topSpendAge].imp||1):0),spend:GBP(topSpend,0),clicks:(ageTotals[topSpendAge]?.clicks||0).toLocaleString()}
     ].map(s=>`<div class="seg-card">
-      <div class="seg-rank">${s.rank} · ${s.note}</div>
+      <div class="seg-rank">${s.rank}</div>
       <div class="seg-title">${s.title}</div>
       <div class="seg-stat"><span>CTR</span><span>${s.ctr}</span></div>
       <div class="seg-stat"><span>Spend</span><span>${s.spend}</span></div>
@@ -1005,18 +1283,18 @@ async function render(){
     });
     const abEl=document.getElementById("abSection");
     if(Object.keys(abVariants).length){
-      abEl.innerHTML=Object.entries(abVariants).map(([base,vs])=>
-        `<div style="margin-bottom:20px">
-          <div style="font-weight:500;font-size:14px;color:var(--forest);margin-bottom:12px">${base}</div>
+      abEl.innerHTML=`<div class="card">${Object.entries(abVariants).map(([base,vs])=>
+        `<div style="padding:24px;border-bottom:1px solid var(--border)">
+          <div style="font-weight:700;font-size:15px;color:var(--forest);margin-bottom:16px;letter-spacing:-0.01em">${base}</div>
           <table><thead><tr><th>Variant</th><th>Spend</th><th>CTR</th><th>CPC</th><th>Out. clicks</th><th>Signal</th></tr></thead>
           <tbody>${vs.map(v=>`<tr>
-            <td style="font-weight:500">${v.ad_name}</td>
+            <td style="font-weight:700">${v.ad_name}</td>
             <td>${GBP(+v.spend,2)}</td><td>${pct(v.ctr)}</td>
             <td>${GBP(v.cpc,3)}</td><td>${ob(v).toLocaleString()}</td>
             <td>${signal(v.ctr,v.cpc)}</td>
           </tr>`).join("")}</tbody></table>
         </div>`
-      ).join("");
+      ).join("")}</div>`;
     }else{
       abEl.innerHTML=`<div class="ab-empty">
         <strong>No active A/B tests detected</strong>
