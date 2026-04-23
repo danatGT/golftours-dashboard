@@ -18,19 +18,30 @@ export default async function handler(req, res) {
 
   const { date_preset, accounts } = req.query;
 
-  // Parse the campaign name to filter by from the filters param
-  // e.g. [["campaign","eq","GT - Traffic - 2026"]] → "GT - Traffic - 2026"
+  // Parse the campaign filter from the filters param.
+  // Supports both "eq" (exact match) and "contains" (substring match).
+  // e.g. [["campaign","eq","GT | Enquiries | 2026"]] or [["campaign","contains","Enquiries"]]
   let campaignFilter = null;
+  let campaignOperator = "eq";
   try {
     const filters = JSON.parse(req.query.filters || "[]");
-    const findEq = (arr) => {
+    const findCampaignFilter = (arr) => {
       for (const item of arr) {
-        if (Array.isArray(item) && item[0] === "campaign" && item[1] === "eq") return item[2];
-        if (Array.isArray(item)) { const r = findEq(item); if (r) return r; }
+        if (Array.isArray(item) && item[0] === "campaign" && (item[1] === "eq" || item[1] === "contains")) {
+          return { value: item[2], operator: item[1] };
+        }
+        if (Array.isArray(item)) {
+          const r = findCampaignFilter(item);
+          if (r) return r;
+        }
       }
       return null;
     };
-    campaignFilter = findEq(filters);
+    const found = findCampaignFilter(filters);
+    if (found) {
+      campaignFilter = found.value;
+      campaignOperator = found.operator;
+    }
   } catch (_) {}
 
   // Parse the requested fields and always inject "campaign" so we can filter
@@ -49,7 +60,7 @@ export default async function handler(req, res) {
   params.set("api_key", apiKey);
   params.set("fields", fieldsToRequest.join(","));
   if (date_preset) params.set("date_preset", date_preset);
-  if (accounts)    params.set("accounts", accounts);
+  if (accounts) params.set("accounts", accounts);
 
   const url = `https://connectors.windsor.ai/facebook?${params.toString()}`;
 
@@ -67,9 +78,13 @@ export default async function handler(req, res) {
     // Normalise to array
     let data = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : []);
 
-    // Filter by campaign — now guaranteed to work because we always fetch the campaign field
+    // Filter by campaign using the appropriate operator
     if (campaignFilter) {
-      data = data.filter(row => row.campaign === campaignFilter);
+      if (campaignOperator === "contains") {
+        data = data.filter(row => row.campaign && row.campaign.includes(campaignFilter));
+      } else {
+        data = data.filter(row => row.campaign === campaignFilter);
+      }
     }
 
     // Strip "campaign" back out if the dashboard didn't originally ask for it
