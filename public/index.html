@@ -680,7 +680,7 @@ async function render(){
     const [campData,adsetData,adData,ageData,dailyData]=await Promise.all([
       fetchWindsor(["campaign","spend","impressions","clicks","ctr","cpc","cpm","reach","frequency","outbound_clicks_outbound_click","actions"]),
       fetchWindsor(["adset_name","spend","impressions","clicks","ctr","cpc","cpm","reach","outbound_clicks_outbound_click","adset_start_time","adset_effective_status","frequency","actions"]),
-      fetchWindsor(["ad_name","adset_name","spend","impressions","clicks","ctr","cpc","reach","outbound_clicks_outbound_click"]),
+      fetchWindsor(["campaign","ad_name","adset_name","spend","impressions","clicks","ctr","cpc","reach","outbound_clicks_outbound_click"]),
       fetchWindsor(["age","gender","spend","impressions","clicks","ctr","reach"]),
       fetchWindsor(["date","spend","ctr","cpm","impressions","clicks","reach"])
     ]);
