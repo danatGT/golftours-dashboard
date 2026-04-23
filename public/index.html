@@ -398,7 +398,7 @@
 <script>
 const ACCOUNT_ID = "532007480578438";
 const CAMPAIGNS = {
-  traffic:   [["campaign","eq","GT - Enquiries - 2026"]],
+  traffic:   [["campaign","eq","GT | Enquiries | 2026"]],
   awareness: [["campaign","eq","GT - Brand Awareness - 2026"]]
 };
 
@@ -491,33 +491,20 @@ function switchCampaign(name){
 
 async function fetchWindsor(fields){
   const campaign = activeCampaign;
-  const p = new URLSearchParams();
-  p.set("fields", fields.join(","));
-  p.set("date_preset", "this_monthT");
-  p.set("accounts", ACCOUNT_ID);
-  p.set("filters", JSON.stringify(CAMPAIGNS[campaign]));
-
-  // Try proxy first (Vercel /api/data), fall back to Windsor directly
-  let res;
-  try {
-    res = await fetch("/api/data?" + p.toString());
-    if (!res.ok) throw new Error("proxy " + res.status);
-  } catch(e) {
-    // Proxy not available — call Windsor directly
-    const WINDSOR_KEY = "2c64d48acd95b2c3659a7ead5128d3b8cb1f"; // paste your key
-    p.set("api_key", WINDSOR_KEY);
-    p.set("connector", "facebook");
-    res = await fetch("https://connectors.windsor.ai/facebook?" + p.toString());
+  const p=new URLSearchParams();
+  p.set("fields",fields.join(","));
+  p.set("date_preset","this_monthT");
+  p.set("accounts",ACCOUNT_ID);
+  p.set("filters",JSON.stringify(CAMPAIGNS[campaign]));
+  const res=await fetch("/api/data?"+p.toString());
+  if(!res.ok){
+    const txt=await res.text();
+    throw new Error("Windsor proxy error "+res.status+": "+txt.slice(0,200));
   }
-
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error("Windsor error " + res.status + ": " + txt.slice(0, 200));
-  }
-  const json = await res.json();
-  if (json.error) throw new Error(json.error);
-  const data = json.data || json;
-  return Array.isArray(data) ? data : [];
+  const json=await res.json();
+  if(json.error) throw new Error(json.error);
+  const data=json.data||json;
+  return Array.isArray(data)?data:[];
 }
 
 async function generateAIInsights(){
